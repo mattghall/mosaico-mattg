@@ -53,8 +53,6 @@ var applyBindingOptions = function(options, ko) {
 
 var start = function(options, templateFile, templateMetadata, jsorjson, customExtensions) {
 
-
-
   templateLoader.fixPageEvents();
 
   var fileUploadMessagesExtension = function(vm) {
@@ -114,8 +112,14 @@ var start = function(options, templateFile, templateMetadata, jsorjson, customEx
   $("<!-- ko template: 'main' --><!-- /ko -->").appendTo(global.document.body);
 
   // templateFile may override the template path in templateMetadata
-  if (typeof templateFile == 'undefined' && typeof templateMetadata != 'undefined') {
-    templateFile = templateMetadata.template;
+  if (typeof templateFile == 'undefined')
+  {
+    if(typeof templateMetadata != 'undefined') {
+      templateFile = JSON.parse(templateMetadata).template;
+    }
+  }
+  else {
+    templateFile = 'templates/' + templateFile + '/template-' + templateFile + '.html';
   }
   // TODO canonicalize templateFile to absolute or relative depending on "relativeUrlsException" plugin
 
@@ -123,44 +127,43 @@ var start = function(options, templateFile, templateMetadata, jsorjson, customEx
 
 };
 
-var initFromLocalStorage = function(options, hash_key, customExtensions) {
-  try {
-    var lsData = localStorageLoader(hash_key, options.emailProcessorBackend);
-    var extensions = typeof customExtensions !== 'undefined' ? customExtensions : [];
-    extensions.push(lsData.extension);
-    var template = _canonicalize(lsData.metadata.template);
-    start(options, template, lsData.metadata, lsData.model, extensions);
-  } catch (e) {
-    console.error("TODO not found ", hash_key, e);
-  }
-};
+function getFileFromServer(url, doneCallback) {
+    var xhr;
 
-var init = function(options, customExtensions) {
+    xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = handleStateChange;
+    xhr.open("GET", url, true);
+    xhr.send();
 
-  var hash = global.location.hash ? global.location.href.split("#")[1] : undefined;
-
-  // Loading from configured template or configured metadata
-  if (options && (options.template || options.data)) {
-    if (options.data) {
-      var data = JSON.parse(options.data);
-      start(options, undefined, data.metadata, data.content, customExtensions);
-    } else {
-      start(options, options.template, undefined, undefined, customExtensions);
+    function handleStateChange() {
+        if (xhr.readyState === 4) {
+            doneCallback(xhr.status == 200 ? xhr.responseText : null);
+        }
     }
-    // Loading from LocalStorage (if url hash has a 7chars key)
-  } else if (hash && hash.length == 7) {
-    initFromLocalStorage(options, hash, customExtensions);
-    // Loading from template url as hash (if hash is not a valid localstorage key)
-  } else if (hash) {
-    start(options, _canonicalize(hash), undefined, undefined, customExtensions);
-  } else {
-    return false;
+}
+
+var FireAllCyclinders = function(options, templateFile, templateMetadata, jsorjson, customExtensions, autosave)
+{
+  var hash = global.location.hash ? global.location.href.split("#")[1] : "deafult";
+  var ext = ".content";
+  if(autosave){
+    ext = ".backup";
   }
-  return true;
+  console.log("HASH: " + hash);
+  getFileFromServer("../../backend-php/saved-templates/" + hash + ext, function(content) {
+    if(content === null) console.log("No Content Found");
+    else console.log("Content Loaded");
+      getFileFromServer("../../backend-php/saved-templates/" + hash + ".meta", function(meta) {
+          if(meta === null) console.log("No Metadata Found");
+          else console.log("Meta Loaded");
+          start(options, templateFile, meta, content, customExtensions);
+          $("#editorMetaData").val(meta);
+        });
+    });
 };
 
 module.exports = {
   isCompatible: templateLoader.isCompatible,
-  init: init,
-  start: start
+  start: start,
+  FireAllCyclinders: FireAllCyclinders,
 };

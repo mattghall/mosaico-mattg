@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <title>Mosaico Editor</title>
     <meta name="viewport" content="width=1024, initial-scale=1">
-
+    <input type="hidden" name="metdata" id="editorMetaData" />
     <link rel="canonical" href="http://mosaico.io" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="matts-extras/modal-stylesheet.css">
 
-    <script src="dist/vendor/jquery.min.js"></script>
     <script src="dist/vendor/knockout.js"></script>
+    <script src="dist/vendor/jquery.min.js"></script>
     <script src="dist/vendor/jquery-ui.min.js"></script>
     <script src="dist/vendor/jquery.ui.touch-punch.min.js"></script>
     <script src="dist/vendor/load-image.all.min.js"></script>
@@ -20,44 +21,468 @@
     <script src="dist/vendor/jquery.fileupload-image.js"></script>
     <script src="dist/vendor/jquery.fileupload-validate.js"></script>
     <script src="dist/vendor/knockout-jqueryui.min.js"></script>
+    <script src="dist/vendor/evol.colorpicker.min.js"></script>
     <script src="dist/vendor/tinymce.min.js"></script>
 
     <script src="dist/mosaico.min.js?v=0.14"></script>
+    <script src="matts-extras/users.js"></script>
     <script>
 $(function() {
   if (!Mosaico.isCompatible()) {
-    alert('Update your browser!');
+    alert('Stop Using Internet Explorer! Your browser is not compatible');
     return;
   }
-  // var basePath = window.location.href.substr(0, window.location.href.lastIndexOf('/')).substr(window.location.href.indexOf('/','https://'.length));
+
   var basePath = window.location.href;
   if (basePath.lastIndexOf('#') > 0) basePath = basePath.substr(0, basePath.lastIndexOf('#'));
   if (basePath.lastIndexOf('?') > 0) basePath = basePath.substr(0, basePath.lastIndexOf('?'));
   if (basePath.lastIndexOf('/') > 0) basePath = basePath.substr(0, basePath.lastIndexOf('/'));
+
   var plugins;
-  // A basic plugin that expose the "viewModel" object as a global variable.
-  // plugins = [function(vm) {window.viewModel = vm;}];
-  var ok = Mosaico.init({
-    imgProcessorBackend: basePath+'/img/',
-    emailProcessorBackend: basePath+'/dl/',
+  plugins = [
+    // plugins for integrating save, test, and download buttons
+    function(viewModel) {
+        var saveCmd = {
+            name: 'Save',
+            enabled: ko.observable(true)
+        };
+        var autosaveCmd = {
+            name: 'AutoSave',
+            enabled: ko.observable(true)
+        };
+        var testCmd = {
+          name: 'Test',
+          enabled: ko.observable(true)
+        };
+        var sendCmd = {
+          name: 'Send',
+          enabled: ko.observable(true)
+        };
+        var copyCmd = {
+          name: 'Copy',
+          enabled: ko.observable(true)
+        };
+        var copyCmd2 = {
+          name: 'Copy2',
+          enabled: ko.observable(true)
+        };
+        var downloadCmd = {
+          name: 'Download',
+          enabled: ko.observable(true)
+        };
+
+        saveCmd.execute = function() {
+          saveCmd.enabled(false);
+          if($('#mdProject').val() == 'unnamed'){
+            var fname = prompt(viewModel.t("Name your project"), "test_email");
+            if(fname !== null) {
+               $('#mdProject').val(fname);
+            }
+          }
+          if($('#mdAuthor').val() == 'unknown'){
+            var author = localStorage.getItem("username");
+            if(author !== null) {
+               $('#mdAuthor').val(author);
+            }
+          }
+          $("#mdLastChanger").val(localStorage.getItem("username"));
+          viewModel.notifier.info(viewModel.t("Saving..."));
+          $('#mdLastEdit').val(Date.now());
+          document.getElementById('saveForm').filename.value = $('#mdHash').val();
+          document.getElementById('saveForm').metadata.value = viewModel.exportMetadata();
+          viewModel.exportJSONtoTextarea('#saveContentTextarea');
+          var postUrl = 'backend-php/dl/';
+          document.getElementById('saveForm').setAttribute("action", postUrl);
+          $.ajax({
+              url:postUrl,
+              type:'post',
+              data:$('#saveForm').serialize(),
+              success:function(){
+                  viewModel.notifier.success(viewModel.t("Saved"));
+              },
+              error:function(){
+                  viewModel.notifier.error(viewModel.t("Save Failed"));
+              }
+          });
+          saveCmd.enabled(true);
+        };
+
+        autosaveCmd.execute = function() {
+          autosaveCmd.enabled(false);
+          saveCmd.enabled(false);
+          if($('#mdProject').val() == 'unnamed'){
+            var fname = prompt(viewModel.t("Name your project"), "test_email");
+            if(fname !== null) {
+               $('#mdProject').val(fname);
+            }
+          }
+          if($('#mdAuthor').val() == 'unknown'){
+            var author = localStorage.getItem("username");
+            if(author !== null) {
+               $('#mdAuthor').val(author);
+            }
+          }
+          $("#mdLastChanger").val(localStorage.getItem("username"));
+          $('#mdLastEdit').val(Date.now());
+          document.getElementById('saveForm').filename.value = $('#mdHash').val();
+          document.getElementById('saveForm').metadata.value = viewModel.exportMetadata();
+          viewModel.exportJSONtoTextarea('#saveContentTextarea');
+          var postUrl = 'backend-php/dl/';
+          document.getElementById('saveForm').setAttribute("action", postUrl);
+          $.ajax({
+              url:postUrl,
+              type:'post',
+              data:$('#saveForm').serialize(),
+              success:function(){
+                  viewModel.notifier.success(viewModel.t("Autosaved"));
+              },
+              error:function(){
+                  viewModel.notifier.error(viewModel.t("Autosave Failed"));
+              }
+          });
+          saveCmd.enabled(true);
+          autosaveCmd.enabled(true);
+        };
+
+        testCmd.execute = function() {
+          testCmd.enabled(false);
+          $('#save').click();
+          var email = localStorage.getItem("testemail");
+          //if (email === null || email == 'null') email = viewModel.t('Insert recipient email address here');
+          //email = prompt(viewModel.t("Test email address"), email);
+          email = "ucwebteam.runme@previews.emailonacid.com";
+          thesubject = $("#mdProject").val();
+          thesubject = "[TEST]" + thesubject;
+          if (email.match(/@/)) {
+            localStorage.setItem("testemail", email);
+            var postUrl = 'backend-php/dl/';
+            var post = $.post(postUrl, {
+              action: 'email',
+              rcpt: email,
+              subject: thesubject,
+              html: viewModel.exportHTML()
+            }, null, 'html');
+            post.fail(function() {
+              console.log("fail", arguments);
+              viewModel.notifier.error(viewModel.t('Unexpected error talking to server: contact us!'));
+            });
+            post.success(function() {
+              console.log("success", arguments);
+              viewModel.notifier.success(viewModel.t("Test sent to Email on Acid..."));
+            });
+            post.always(function() {
+              testCmd.enabled(true);
+            });
+          } else {
+            alert(viewModel.t('Invalid email address'));
+            testCmd.enabled(true);
+          }
+        };
+
+        sendCmd.execute = function() {
+          sendCmd.enabled(false);
+          $('#save').click();
+          var email = localStorage.getItem("testemail");
+          //if (email === null || email == 'null') email = viewModel.t('Insert recipient email address here');
+          //email = prompt(viewModel.t("Send email address"), email);
+          email = $("#mdAuthor").val() + "@spu.edu";
+          thesubject = $("#mdProject").val();
+          thesubject = "[TEST] " + thesubject;
+          if (email.match(/@/)) {
+            localStorage.setItem("testemail", email);
+            console.log("TODO sending...", email);
+            var postUrl = 'backend-php/dl/';
+            var post = $.post(postUrl, {
+              action: 'email',
+              rcpt: email,
+              subject: thesubject,
+              html: viewModel.exportHTML()
+            }, null, 'html');
+            post.fail(function() {
+              console.log("fail", arguments);
+              viewModel.notifier.error(viewModel.t('Unexpected error talking to server: contact us!'));
+            });
+            post.success(function() {
+              console.log("success", arguments);
+              viewModel.notifier.success(viewModel.t("Email sent to " + email));
+            });
+            post.always(function() {
+              sendCmd.enabled(true);
+            });
+          } else {
+            alert(viewModel.t('Invalid email address'));
+            sendCmd.enabled(true);
+          }
+        };
+
+         copyCmd.execute = function () {
+            copyCmd.enabled(false);
+            $('#save').click();
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val("CLICK COPY AGAIN TO COPY CONTENTS").select();
+            document.execCommand("copy");
+            $temp.remove();
+
+            // viewModel.exportHTMLtoTextarea('#downloadHtmlTextarea');
+            var postUrl = 'backend-php/dl/';
+            viewModel.notifier.info(viewModel.t("Copying..."));
+
+            var post = $.post(postUrl, {
+              action: 'copy',
+              html: viewModel.exportHTML()
+            }, null, 'html');
+            post.success(function(data) {
+              $("#downloadHtmlTextarea").val(data.replace(/&amp;/g, '&'));
+              viewModel.notifier.info(viewModel.t("Content Prepared. Click again to Copy"));
+              $("#copy1").hide();
+              $("#copy2").show();
+            });
+         }
+
+         copyCmd2.execute = function(){
+           var $temp = $("<input>");
+           $("body").append($temp);
+           $temp.val($("#downloadHtmlTextarea").val()).select();
+           document.execCommand("copy");
+           $temp.remove();
+           copyCmd.enabled(true);
+           viewModel.notifier.success(viewModel.t("Copied to Clipboard"));
+           $("#copy1").show();
+           $("#copy2").hide();
+         }
+
+        downloadCmd.execute = function() {
+          downloadCmd.enabled(false);
+          viewModel.notifier.info(viewModel.t("Downloading..."));
+          viewModel.exportHTMLtoTextarea('#downloadHtmlTextarea');
+          var postUrl = 'backend-php/dl/';
+          document.getElementById('downloadForm').setAttribute("action", postUrl);
+          document.getElementById('downloadForm').submit();
+          downloadCmd.enabled(true);
+        };
+        viewModel.test = testCmd;
+        viewModel.send = sendCmd;
+        viewModel.copy = copyCmd;
+        viewModel.copy2 = copyCmd2;
+        viewModel.download = downloadCmd;
+        viewModel.save = saveCmd;
+        viewModel.autosave = autosaveCmd;
+    }
+  ];
+
+  var autosave = getUrlParameter("as");
+  if(typeof autosave !== 'undefined' && autosave == 't'){
+    autosave = true;
+  }
+  else {
+    autosave = false;
+  }
+  var template = getUrlParameter("template");
+
+  Mosaico.FireAllCyclinders({
+    imgProcessorBackend: 'backend-php/img/',
+    emailProcessorBackend: 'backend-php/dl/',
     titleToken: "MOSAICO Responsive Email Designer",
     fileuploadConfig: {
-      url: basePath+'/upload/',
-      // messages??
+      url: 'backend-php/upload/',
     }
-  }, plugins);
-  if (!ok) {
-    console.log("Missing initialization hash, redirecting to main entrypoint");
-    document.location = ".";
+  }, template, undefined /* metadata */, undefined /* model */, plugins, autosave);
+  if(autosave)
+  {
+    var r = confirm("This is an autosaved copy of the document. Pressing save will overwrite any saved copy with the same hash. Press OK to continue or cancel to return to the last saved copy.");
+    if (r != true) {
+        var hash = location.hash ? location.href.split("#")[1] : "deafult";
+        hash = "editor.html#" + hash;
+        window.location = hash;
+    }
   }
 });
+
+
+
+function resizeWindow()
+{
+  if($( window ).width() < 1080)
+  {
+    $("span:contains('Download')").hide();
+    $("span:contains('Test')").hide();
+    $("span:contains('Send')").hide();
+    $("span:contains('Copy')").hide();
+    $("span:contains('Save')").hide();
+    $("span:contains('Gallery')").hide();
+  }
+  else if($( window ).width() < 1115)
+  {
+    $("span:contains('Download')").hide();
+    $("span:contains('Test')").hide();
+    $("span:contains('Send')").hide();
+    $("span:contains('Copy')").show();
+    $("span:contains('Save')").show();
+    $("span:contains('Gallery')").hide();
+  }
+  else if($( window ).width() < 1200)
+  {
+    $("span:contains('Download')").hide();
+    $("span:contains('Test')").hide();
+    $("span:contains('Send')").hide();
+    $("span:contains('Copy')").show();
+    $("span:contains('Save')").show();
+    $("span:contains('Gallery')").show();
+  }
+  else if($( window ).width() < 1230)
+  {
+    $("span:contains('Download')").show();
+    $("span:contains('Test')").hide();
+    $("span:contains('Send')").hide();
+    $("span:contains('Copy')").show();
+    $("span:contains('Save')").show();
+    $("span:contains('Gallery')").show();
+  }
+  else {
+    $("span:contains('Download')").show();
+    $("span:contains('Test')").show();
+    $("span:contains('Send')").show();
+    $("span:contains('Copy')").show();
+    $("span:contains('Save')").show();
+    $("span:contains('Gallery')").show();
+  }
+}
+function toggleToolbar()
+{
+  if($('#tooltabs').css('display') == 'none'){
+    $('#tooltabs').css('display','block');
+    $('#main-edit-area').css('left',400);
+    $("#main-toolbox").show();
+    $("#showMenuButton").hide();
+    $("#hideMenuButton").show();
+    $("#toolbar").css("left",400);
+  }
+  else {
+    $('#tooltabs').css('display','none');
+    $('#main-edit-area').css('left',0);
+    $("#main-toolbox").hide();
+    $("#showMenuButton").show();
+    $("#hideMenuButton").hide();
+    $("#toolbar").css("left",40);
+  }
+}
+
+$(document).ready(function(){
+    window.setInterval(function(){
+      $('#autosave').click();
+    }, 30000);
+
+    $( window ).resize(function() {
+        resizeWindow();
+    });
+});
+
+dateFormat = function(unixdate) {
+  if (typeof unixdate == 'undefined') return 'DD-MM-YYYY';
+  var fullDate = new Date();
+  fullDate.setTime(ko.utils.unwrapObservable(unixdate));
+  var m = ""+(fullDate.getMonth()+1);
+  var h = ""+(fullDate.getHours());
+  var i = ""+(fullDate.getMinutes());
+  var d = ""+(fullDate.getDate());
+  var y = ""+(fullDate.getFullYear());
+  return m + "/" + (d.length == 1 ? '0' : '') + d + "/" + y + " " +(h.length == 1 ? '0' : '') + h + ":" + (i.length == 1 ? '0' : '') + i;
+};
+
+function GetTemplateFromFullName(templ)
+{
+  var first = templ.indexOf('/',0) + 1;
+  var last = templ.indexOf('/',first + 1);
+  var result = templ.substring(first,last);
+  return result;
+}
+
+var loadMetaToEditor = function(){
+  if($("#editorMetaData").val() != ""){
+    var metadata = JSON.parse($("#editorMetaData").val());
+      $("#mdHash").val(metadata.hash);
+     if(typeof metadata.name !== 'undefined')
+       $("#mdProject").val(metadata.name);
+     if(typeof metadata.template !== 'undefined')
+     {
+       $("#mdTemplate").val(metadata.template);
+       $("#mdTemplateDisp").val(GetTemplateFromFullName(metadata.template));
+     }
+     if(typeof metadata.dept !== 'undefined')
+       $("#mdDept").val(metadata.dept);
+     if(typeof metadata.author !== 'undefined')
+       $("#mdAuthor").val(metadata.author);
+     else
+      $("#mdAuthor").val(localStorage.getItem("username"));
+    if(typeof metadata.lastchanger !== 'undefined')
+      $("#mdLastChanger").val(metadata.lastchanger);
+      else {
+        $("#mdLastChanger").val(metadata.author);
+      }
+    if(typeof metadata.lastEdit != 'undefined')
+    {
+      if(typeof metadata.dateCreated != 'undefined')
+        {
+          $("#mdDateCreated").val(metadata.dateCreated);
+          $("#mdDateCreatedDisp").val(dateFormat(metadata.dateCreated));
+        }
+        else{
+          $("#mdDateCreated").val(metadata.lastEdit);
+          $("#mdDateCreatedDisp").val(dateFormat(metadata.lastEdit));
+        }
+      $("#mdLastEdit").val(dateFormat(metadata.lastEdit));
+    }
+   }
+   else if($("#mdAuthor") !== null){
+     $("#mdAuthor").val(localStorage.getItem("username"));
+     var template = getUrlParameter("template");
+     $("#mdTemplateDisp").val(template);
+     template = "templates/" + template + "/template-" + template + ".html";
+     $("#mdTemplate").val(template);
+     $("#mdDateCreated").val(Date.now());
+     $("#mdDateCreatedDisp").val(dateFormat(Date.now()));
+   }
+ };
+
+ var getUrlParameter = function getUrlParameter(sParam) {
+     var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+         sURLVariables = sPageURL.split('&'),
+         sParameterName,
+         i;
+
+     for (i = 0; i < sURLVariables.length; i++) {
+         sParameterName = sURLVariables[i].split('=');
+
+         if (sParameterName[0] === sParam) {
+             return sParameterName[1] === undefined ? true : sParameterName[1];
+         }
+     }
+ };
+
+ var ChangeOwner = function()
+ {
+   var username = prompt("Who would you like to assign this email to?", $("#mdAuthor").val());
+   var getUrl = "backend-php/valid-user.php?username=" + username;
+   $.get( getUrl, function( data ) {
+     console.log("Username valid = " + data);
+     if(data != "true")
+     {
+       alert("Please enter a valid username");
+     }
+     else {
+       $("#mdAuthor").val(username);
+       $("#extraSaveButton").click();
+     }
+   });
+ }
+
     </script>
-    
+
     <link rel="stylesheet" href="dist/mosaico-material.min.css?v=0.10" />
     <link rel="stylesheet" href="dist/vendor/notoregular/stylesheet.css" />
+    <link rel="stylesheet" href="dist/vendor/evol.colorpicker.min.css" /> <!-- 2k -->
   </head>
-  <body class="mo-standalone">
-
-
+  <body class="mo-standalone" style="background-color:05203e;">
   </body>
 </html>

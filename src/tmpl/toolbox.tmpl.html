@@ -3,7 +3,9 @@
     <li data-bind="tooltips: {}"><a title="Blocks ready to be added to the template" data-local="true" href="#toolblocks" data-bind="attr: { title: $root.t('Blocks ready to be added to the template') }"><i class="fa fa-fw fa-cubes"></i> <span data-bind="html: $root.t('Blocks')">Blocks</span></a></li>
     <li data-bind="tooltips: {}"><a title="Edit content options" href="#toolcontents" data-local="true" data-bind="attr: { title: $root.t('Edit content options') }"><i class="fa fa-fw fa-pencil"></i> <span data-bind="html: $root.t('Content')">Content</span></a></li>
     <li data-bind="tooltips: {}"><a title="Edit style options" href="#toolstyles" data-local="true" data-bind="attr: { title: $root.t('Edit style options') }"><i class="fa fa-fw fa-paint-brush"></i> <span data-bind="html: $root.t('Style')">Style</span></a></li>
+    <li data-bind="tooltips: {}"><a title="IMG" data-local="true" data-bind="click: $root.showGallery, attr: { title: $root.t('Show Gallery') }"><i class="fa fa-fw fa-picture-o"></i> <span>IMG</span></a></li>
   </ul>
+
 
   <div id="toolblocks" data-bind="scrollable: true">
     <div class="block-list" data-bind="foreach: blockDefs" style="text-align: center">
@@ -26,7 +28,7 @@
     <!-- /ko -->
     <!-- ko block: content --><!-- /ko -->
   </div>
-  
+
   <div id="toolstyles" data-bind="scrollable: true, withProperties: { templateMode: 'styler' }">
     <!-- ko if: typeof $root.content().theme === 'undefined' || typeof $root.content().theme().scheme === 'undefined' || $root.content().theme().scheme() === 'custom' -->
       <!-- ko if: $root.selectedBlock() !== null -->
@@ -41,7 +43,7 @@
     <!-- /ko -->
   </div>
 </div>
-        
+
 <div id="toolimages" class="slidebar" data-bind="scrollable: true, css: { hidden: $root.showGallery() === false }">
   <div class="close" data-bind="click: $root.showGallery.bind($element, false);">X</div>
   <span class="pane-title" data-bind="text: $root.t('Gallery:')">Gallery:</span>
@@ -86,7 +88,7 @@
 
 <div id="tooldebug" class="slidebar" data-bind="css: { hidden: $root.debug() === false }">
   <div class="close" data-bind="click: $root.debug.bind($element, false);">X</div>
-  
+
   <!-- ko if: $root.debug -->
   Content:
   <pre data-bind='text: ko.toJSON(content, null, 2)' style="overflow: auto; height: 20%"></pre>
@@ -102,7 +104,7 @@
 
 <div id="tooltheme" class="ui-widget slidebar" data-bind="css: { hidden: $root.showTheme() === false }">
   <div class="close" data-bind="click: $root.showTheme.bind($element, false);">X</div>
-  
+
   <!-- ko withProperties: { templateMode: 'styler' } -->
     <!-- ko if: $root.showTheme -->
       <!-- ko block: $root.content().theme --><!-- /ko -->

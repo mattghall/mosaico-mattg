@@ -5,4 +5,12 @@ uploads/**
 .tmp/**
 !.tmp/README.md
 build
-dist
+dist/vendor
+dist/mosaico-material.min.css
+dist/mosaico-material.min.css.map
+dist/mosaico.min.css
+dist/mosaico.min.css.map
+dist/mosaico.min.js
+dist/mosaico.min.js.map
+dist/fa
+dist/lang

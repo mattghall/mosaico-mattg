@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no" />
+  <title style="-ko-bind-text: @titleText">TITLE</title>
+  <style type="text/css">
+    @supports -ko-blockdefs {
+      id { widget: id }
+      size { label: Size; widget: select; options: 8|9|10|11|12|13|14|15|16|18|20|22|25|28|31; }
+      visible { label: Visible?; widget: boolean }
+      color { label: Color; widget: color }
+      radius {
+        label: Corner Radius;
+        widget: integer;
+        max: 20;
+        help: Attention - this property is not supported on all email clients (i.e. Outlook)
+      }
+      face { label: Font; widget: select; options: Arial, Helvetica, sans-serif=Arial|Arial Black, Arial Black, Gadget, sans-serif=Arial Black|Comic Sans MS, Comic Sans MS5, cursive=Comic Sans|Courier New, Courier New, monospace=Courier|Georgia, serif=Georgia|Impact, sans-serif=Impact|Lucida Console, Monaco, monospace=Lucida Console|Lucida Sans Unicode, Lucida Grande, sans-serif=Lucida Sans Unicode|Times New Roman, Times, serif=Times New Roman|Verdana, Geneva, sans-serif=Verdana}
+      decoration { label: Decoration; widget: select; options: none=None|underline=Underline }
+      linksColor { label: Link Color; extend: color }
+      linksDecoration { label: Underlined Links?; extend: decoration }
+      buttonColor { label: Button Color; extend: color }
+      text { label: Paragraph; widget: text }
+      url { label: Link; widget: url }
+      src { label: Image; widget: src }
+      hrWidth { label: Width; widget: select; options:10|20|30|40|50|60|70|80|90|100; }
+      hrHeight { label: Line height; widget: integer; max: 80; }
+
+      height { label: Height; widget: integer }
+      imageHeight { label: Image Height; extend: height; }
+      spacerSize { label: Height; widget: integer; max: 90; min: 4; }
+      align { label: Alignment; widget: select; options:left=Left|right=Right|center=Center}
+      alt {
+        label: Alternative Text;
+        widget: text;
+        help: Alternative text will be shown on email clients that does not download image automatically;
+      }
+      sponsor { label: Sponsor; properties: visible=true src url alt; category: hidden }
+      titleText {label:Title Text;category: hidden;}
+      gutterVisible { label: Show Gutter; extend: visible }
+
+      preheaderLinkOption {
+        label: Unsubscribe Link;
+        widget: select;
+        options: [profile_link]=Profile|[unsubscribe_link]=Unsubscribe|none=None;
+        help: If -None- is selected, preHeader text will be shown;
+      }
+
+      hrStyle { label: Separator Style;properties:color hrWidth hrHeight; }
+      hrStyle:preview { height: 200%; width: 200%; bottom: 20px; -ko-border-bottom: @[hrHeight]px solid @color; }
+      preheaderVisible { label: Show Preheader; extend: visible; help: Preheader block is the first one on the top of the page. It contains web version link and optionally unsubscribe link or a preheader text that will be shown as a preview on some email clients; }
+
+      /* content types */
+      blocks { label: Blocks; properties: blocks[]; }
+      link { label: Link; properties: text url }
+      image { label: Image; properties: src url alt }
+      backgroundColor { label: Background Color; extend: color }
+      buttonLink { label: Button; extend: link }
+
+      /* texts and links */
+      textStyle { label: Text; properties: face color size }
+      textStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
+      linkStyle { label: Link; properties: face color size decoration=none }
+      linkStyle:preview { -ko-bind-text: @['Link']; -ko-font-size: @[size]px; -ko-font-family: @face; -ko-color: @color; -ko-text-decoration: @[decoration] }
+      longTextStyle { label: Paragraph; properties: face color size linksColor   }
+      longTextStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
+      bigButtonStyle { label: Big Button; extend: buttonStyle }
+      titleTextStyle { label: Title; extend: textStyle }
+      /* background */
+      externalBackgroundColor { label: External Background; extend: color }
+
+      externalTextStyle { label: Alternative Text; extend: textStyle }
+      externalTextStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
+
+      bigTitleStyle { label: Title; properties: face color size align}
+      bigTitleStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
+      /* buttons */
+      buttonStyle color { label: Text Color; extend: color }
+      buttonStyle size { label: Text Size; extend: size }
+      buttonStyle { label: Button; properties: face color size buttonColor radius }
+      buttonStyle:preview { -ko-bind-text: @['Button']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; -ko-background-color: @buttonColor; padding-left: 5px; -ko-border-radius: @[radius]px; }
+
+      /* contents */
+      preheaderText {label: PreHeader Text; extend:text; help: This text will be shown on some email clients as a preview of the email contents;}
+      leftImage { label: Left Image; extend: image }
+      leftLongText { label: Left Text; extend: text }
+      leftButtonLink { label: Left Button; extend: buttonLink }
+      middleImage { label: Central Image; extend: image }
+      middleLongText { label: Central Text; extend: text }
+      middleButtonLink { label: Central Button; extend: buttonLink }
+      rightImage { label: Right Image; extend: image }
+      rightLongText { label: Right Text; extend: text }
+      rightButtonLink { label: Right Button; extend: buttonLink }
+      webversionText{ label: Web Link Text; extend: text;}
+      unsubscribeText{ label: Unsubscribe Link; extend: text;}
+
+      titleVisible { label: Show Title; extend: visible; }
+      buttonVisible { label: Show Button; extend: visible; }
+      imageVisible { label: Show Image; extend: visible; }
+
+      contentTheme { label: Main Style; }
+      contentTheme:preview { -ko-background-color: @[backgroundColor] }
+      frameTheme { label: Frame Style; }
+      frameTheme:preview { -ko-background-color: @[backgroundColor] }
+      template preheaderText { label: Preheader; }
+
+      template { label: Page; theme: frameTheme ;properties:  preheaderVisible=true; version: 1.0.5; }
+
+      textBlock { label: Text Block; properties: backgroundColor longTextStyle longText; theme: contentTheme}
+
+
+      textBlock:preview,
+    }
+  </style>
+  <style type="text/css" data-inline="true">
+    body { Margin: 0; padding: 0; }
+    img { border: 0px; display: block; }
+
+
+    .oldwebkit { max-width: 570px; }
+    td.vb-outer { padding-left: 9px; padding-right: 9px; }
+    table.vb-container, table.vb-row, table.vb-content {
+      border-collapse: separate;
+    }
+    table.vb-row {
+      border-spacing: 9px;
+    }
+    table.vb-row.halfpad {
+      border-spacing: 0;
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+    table.vb-row.fullwidth {
+      border-spacing: 0;
+      padding: 0;
+    }
+    table.vb-container {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    table.vb-container.fullpad {
+      border-spacing: 18px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    table.vb-container.halfpad {
+      border-spacing: 9px;
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+    table.vb-container.fullwidth {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  </style>
+  <style type="text/css">
+    /* yahoo, hotmail */
+    .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+    .yshortcuts a { border-bottom: none !important; }
+    .vb-outer { min-width: 0 !important; }
+    .RMsgBdy, .ExternalClass {
+      width: 100%;
+      background-color: #3f3f3f;
+      -ko-background-color: @[_theme_.frameTheme.backgroundColor]
+    }
+
+    /* outlook */
+    table { mso-table-rspace: 0pt; mso-table-lspace: 0pt; }
+    #outlook a { padding: 0; }
+    img { outline: none; text-decoration: none; border: none; -ms-interpolation-mode: bicubic; }
+    a img { border: none; }
+
+    @media screen and (max-device-width: 600px), screen and (max-width: 600px) {
+      table.vb-container, table.vb-row {
+        width: 95% !important;
+      }
+
+      .mobile-hide { display: none !important; }
+      .mobile-textcenter { text-align: center !important; }
+
+      .mobile-full {
+        float: none !important;
+        width: 100% !important;
+        max-width: none !important;
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+      }
+      img.mobile-full {
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+      }
+    }
+
+    body, table, td, p, a, li, blockquote {
+    	-ms-text-size-adjust: 100%;
+    	-webkit-text-size-adjust: 100%;
+    } /* Prevent Windows- and Webkit-based mobile platforms from changing declared text sizes. */
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+    p, li {
+    	color: #000000;
+    	font-family: Helvetica;
+    	font-size: 14px;
+    	line-height: 1.6;
+    }
+    h1 {
+    	color: #202020;
+    	font-family: Georgia, Palatino, serif;
+    	font-size: 20px;
+    	line-height: 125%;
+    	text-align: left;
+    	font-weight: normal;
+    	margin: 20px 0;
+    }
+    a {
+    	color: #7f1335;
+    	text-decoration: underline;
+    }
+    .dept-website a {
+    	color: #555555;
+    	text-decoration: underline;
+    }
+
+    .officename a {
+    	color: #7f1335;
+    	text-decoration: none;
+    }
+
+    @media only screen and (max-width: 650px){
+    		table{
+    			width:100%!important;
+    		}
+    }
+  </style>
+  <style type="text/css" data-inline="true">
+    [data-ko-block=textBlock] .links-color a,
+    [data-ko-block=textBlock] .links-color a:link,
+    [data-ko-block=textBlock] .links-color a:visited,
+    [data-ko-block=textBlock] .links-color a:hover {
+      color: #3f3f3f;
+      -ko-color: @longTextStyle.linksColor;
+      text-decoration: underline;
+    }
+    [data-ko-block=textBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=textBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=textBlock] .long-text p:first-child { Margin-top: 0px; }
+
+  </style>
+</head>
+<body bgcolor="#3f3f3f" text="#919191" alink="#cccccc" vlink="#cccccc" style="background-color: #f7f7f7; color: #000000;">
+  <center>
+  <div data-ko-container="main" data-ko-wrap="false">
+
+    <!-- textBlock -->
+    <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf;" data-ko-block="textBlock">
+        <tr>
+            <td class="vb-outer" align="center" valign="top" bgcolor="#ffffff" style="background-color: #ffffff;">
+                <!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->
+                <div class="oldwebkit">
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin-top:0; margin: 0 auto; width:600px;">
+                    <tr>
+                      <td><!-- HEADER -->
+
+                        <p align="center" style="line-height:1.2"><img src="https://spu.edu/images/global_header_images/dept-ema-header-logo.png" alt="" width="161" height="120" style="margin:0; padding:0;" border="0" /><br />
+
+                        <strong class="officename"><a href="http://spu.edu"><span data-ko-editable="officeText">Office Name Goes Here!</span></a></strong></p>
+
+                        <p  style="border-bottom: double #dddddd;">&nbsp;</p>
+
+                        <!-- BODY COPY -->
+
+                        <h1><span data-ko-editable="titleText">Email Title</span></h1>
+                        <div style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px;
+                        -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color" data-ko-editable="longText" class="long-text links-color rte">
+                          <p>
+                            Email Content goes here!
+                          </p>
+                       </div>
+
+                        <!-- FOOTER -->
+
+                        <p>&nbsp;</p>
+                        <p style="font-size:11px; font-family:'Helvetica','sans-serif'; font-weight:bold; text-align:left; color:#7F1335; line-height:1.5; -webkit-text-size-adjust:none; letter-spacing:3px;"><a href="http://spu.edu/" style="text-decoration:none;">SEATTLE
+                          PACIFIC UNIVERSITY<br>SINCE 1891</a></p>
+                        <p align="center" style="font-size:11px; font-family:'Helvetica','sans-serif'; text-align:left; color:#555555; line-height:1.5; -webkit-text-size-adjust:none;" class="dept-website">
+                          3307 3rd Ave. W.<br />
+                          Seattle, WA 98119-1950, U.S.A.<br />
+                          <a href="http://*|UNSUB|*" style="color: #333333; text-decoration: underline;"><span style="color: #333333; text-decoration: underline;">Unsubscribe</span></a> &nbsp;|&nbsp;
+                          <a href="http://*|ARCHIVE|*" style="color: #333333; text-decoration: underline;"><span style="color: #333333; text-decoration: underline;">View this email online</span></a>.
+                          <p>&nbsp;</p>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->
+            </td>
+        </tr>
+    </table>
+    <!-- /textBlock -->
+    </div>
+  </center>
+</body>
+</html>

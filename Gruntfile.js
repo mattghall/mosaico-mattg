@@ -95,7 +95,7 @@ module.exports = function(grunt) {
             fullPaths: false,
             standalone: 'Mosaico'
           },
-          transform: ['uglifyify'],
+          //transform: ['uglifyify'],
           watch: true,
         },
         files: {

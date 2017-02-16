@@ -140,13 +140,8 @@ var templateLoader = function(performanceAwareCaller, templateFileName, template
   var templateUrlConverter = _templateUrlConverter.bind(undefined, templatePath);
 
   var metadata;
-  if (typeof templateMetadata == 'undefined') {
-    metadata = {
-      template: templateFile,
-      // TODO l10n?
-      name: 'No name',
-      created: Date.now()
-    };
+  if (templateMetadata === null || templateMetadata == "\"null\"" || typeof templateMetadata == 'undefined') {
+    metadata = '{"hash":"####","template":"' + templateFile + '","name":"unnamed","author":"unknown","created":' + Date.now() + ',"templateversion":"1.0.5","editorversion":"0.14.0"}';
   } else {
     metadata = templateMetadata;
   }
@@ -209,7 +204,7 @@ var templateCompiler = function(performanceAwareCaller, templateUrlConverter, te
     },
     dispose: function() {
       for (var i = createdTemplates.length - 1; i >= 0; i--) {
-        templateSystem.removeTemplate(createdTemplates[i]);
+            templateSystem.removeTemplate(createdTemplates[i]);
       }
     }
   };
@@ -235,6 +230,8 @@ var templateCompiler = function(performanceAwareCaller, templateUrlConverter, te
 
   var incompatibleTemplate = false;
   if (typeof jsorjson !== 'undefined' && jsorjson !== null) {
+    // Strip the extra stuff I save because I'm a dufus
+    jsorjson = jsorjson.replace(/\r?\n|\r/g," ");
     var unwrapped;
     if (typeof jsorjson == 'string') {
       unwrapped = ko.utils.parseJson(jsorjson);
@@ -278,21 +275,24 @@ var templateCompiler = function(performanceAwareCaller, templateUrlConverter, te
   // initialize the viewModel object based on the content model.
   var viewModel = performanceAwareCaller('initializeViewmodel', initializeViewmodel.bind(this, content, blockDefs, templateUrlConverter, galleryUrl));
 
-  viewModel.metadata = metadata;
   // let's run some version check on template and editor used to build the model being loaded.
   var editver = '0.14.0';
-  if (typeof viewModel.metadata.editorversion !== 'undefined' && viewModel.metadata.editorversion !== editver) {
-    console.warn("The model being loaded has been created with an older editor version", viewModel.metadata.editorversion, "vs", editver);
-  }
-  viewModel.metadata.editorversion = editver;
+  if(typeof viewModel.metadata == 'undefined')
+  {
+    viewModel.metadata = JSON.parse(metadata);
+      if (typeof viewModel.metadata.editorversion !== 'undefined' && viewModel.metadata.editorversion !== editver) {
+        console.warn("The model being loaded has been created with an older editor version", viewModel.metadata.editorversion, "vs", editver);
+      }
 
-  if (typeof templateDef.version !== 'undefined') {
-    if (typeof viewModel.metadata.templateversion !== 'undefined' && viewModel.metadata.templateversion !== templateDef.version) {
-      console.error("The model being loaded has been created with a different template version", templateDef.version, "vs", viewModel.metadata.templateversion);
-    }
-    viewModel.metadata.templateversion = templateDef.version;
-  }
+      if (typeof templateDef.version !== 'undefined') {
+        if (typeof viewModel.metadata.templateversion !== 'undefined' && viewModel.metadata.templateversion !== templateDef.version) {
+          console.error("The model being loaded has been created with a different template version", templateDef.version, "vs", viewModel.metadata.templateversion);
+        }
+        viewModel.metadata.templateversion = templateDef.version;
+      }
 
+      viewModel.metadata.editorversion = editver;
+  }
   templateSystem.init();
 
   // everything's ready, start knockout bindings.

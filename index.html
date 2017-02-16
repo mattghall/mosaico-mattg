@@ -2,21 +2,21 @@
 <html>
   <head>
     <meta name="viewport" content="width=480, initial-scale=1">
-    <title>Free responsive email template editor | Mosaico.io</title>
+    <title>Super Rad Email Template Maker for the Cool Kids</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     <meta name="Title" content="Free newsletter template editor. Build responsive email simply."  />
-    <meta name="description" content="Mosaico is the first open source email template editor proudly brought to you by VOXmail: it is powerful and free! The email template builder supports responsive design and live wysiwyg editing." />
+    <meta name="description" content="Mosaico is the first open source email template editor proudly brought to you by VOXmail! It has since been completely overhauled to work in an enterprise setting by m@g!" />
     <meta name="keywords" content="responsive email designer, email editor, free email editor, email template creator, open source email editor" />
-    <meta name="author" content="VOXmail" />
+    <meta name="author" content="m@g" />
     <meta name="application-name" content="Mosaico" />
-    <meta property="og:title" content="Mosaico Email Editor" /> 
-    <meta property="og:image" content="http://mosaico.io/dist/img/mosaico-v.gif" /> 
-    <meta property="og:description" content="Outstanding opensource email template editor by VOXmail.it" /> 
+    <meta property="og:title" content="Mosaico Email Editor" />
+    <meta property="og:image" content="http://mosaico.io/dist/img/mosaico-v.gif" />
+    <meta property="og:description" content="Write SPU emails here!" />
     <meta property="og:url" content="http://mosaico.io" />
     <meta property="og:type" content="website" />
 
-    <link rel="canonical" href="http://mosaico.io" />
+    <link rel="canonical" href="http://mosaico.spu.edu" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
@@ -25,103 +25,78 @@
 
     <script src="dist/vendor/knockout.js"></script>
     <script src="dist/vendor/jquery.min.js"></script>
+    <script src="matts-extras/users.js"></script>
+    <script src="matts-extras/splashdatasort.js"></script>
+
     <script>
-      var initialEdits = [];
-      if (localStorage.getItem('edits')) {
-        var editKeys = JSON.parse(localStorage.getItem('edits'));
-        var md;
-        for (var i = 0; i < editKeys.length; i++) {
-          md = localStorage.getItem('metadata-'+editKeys[i]);
-          if (typeof md == 'string') {
-            initialEdits.push(JSON.parse(md));
-          } else {
-            console.log("Ignoring saved key", editKeys[i], "type", typeof md, md);
-          }
+    $( document ).ready(function() {
+        GetUser();
+        var user = localStorage.getItem("username");
+        if(user !== null)
+          $("#welcomeMsg").html("Welcome " + user);
+    });
+
+    function gimmedata() {
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
         }
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                LoadSavedData(xmlhttp.responseText);
+            }
+        };
+        xmlhttp.open("GET","backend-php/get-metadata.php",true);
+        xmlhttp.send();
+    }
 
-        initialEdits.sort(function(a, b) {
-          var lastA = a.changed ? a.changed : a.created;
-          var lastB = b.changed ? b.changed : b.created;
-          if (lastA < lastB) return 1;
-          if (lastA > lastB) return -1;
-          return 0;
-        });
-      }
 
-      var viewModel = {
-        showSaved: ko.observable(false),
-        edits: ko.observableArray(initialEdits),
-        templates: [{
-          name: 'versafix-1', desc: 'The versatile template'
-        },{
-          name: 'tedc15', desc: 'The TEDC15 template'
-        },{
-          name: 'tutorial', desc: 'The Tutorial'
-        }]
-      };
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
 
-      viewModel.edits.subscribe(function(newEdits) {
-        var keys = [];
-        for (var i = 0; i < newEdits.length; i++) {
-          keys.push(newEdits[i].key);
-          localStorage.setItem('metadata-'+newEdits[i].key, ko.toJSON(newEdits[i]));
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
         }
-        localStorage.setItem('edits', ko.toJSON(keys));
-      });
+    };
 
-      viewModel.dateFormat = function(unixdate) {
-        if (typeof unixdate == 'undefined') return 'DD-MM-YYYY';
-        var d = new Date();
-        d.setTime(ko.utils.unwrapObservable(unixdate));
-        var m = ""+(d.getMonth()+1);
-        var h = ""+(d.getHours());
-        var i = ""+(d.getMinutes());
-        return d.getDate()+"/"+(m.length == 1 ? '0' : '')+m+"/"+d.getFullYear()+" "+(h.length == 1 ? '0' : '')+h+":"+(i.length == 1 ? '0' : '')+i;
-      };
-
-      viewModel.newEdit = function(shorttmplname) {
-        console.log("new", this, template);
-        var d = new Date();
-        var rnd = Math.random().toString(36).substr(2, 7);
-        var template = 'templates/'+shorttmplname+'/template-'+shorttmplname+'.html';
-        viewModel.edits.unshift({ created: Date.now(), key: rnd, name: shorttmplname, template: template });
-        document.location = 'editor.html#'+rnd;
-        // { data: 'AAAA-MM-GG', key: 'ABCDE' }
-        // viewModel.edits.push(template);
-      };
-      viewModel.renameEdit = function(index) {
-        var newName = window.prompt("Modifica nome", viewModel.edits()[index].name);
-        if (newName) {
-          var newItem = JSON.parse(ko.toJSON(viewModel.edits()[index]));
-          newItem.name = newName;
-          viewModel.edits.splice(index, 1, newItem);
-        }
-        return false;
-      };
-      viewModel.deleteEdit = function(index) {
-        var confirm = window.confirm("Are you sure you want to delete this content?");
-        if (confirm) {
-          var res = viewModel.edits.splice(index, 1);
-          console.log("removing template ", res);
-          localStorage.removeItem('template-'+res[0].key);
-        }
-        return false;
-      };
-      viewModel.list = function(clean) {
-        for (var i = localStorage.length - 1; i >= 0; i--) {
-          var key = localStorage.key(i);
-          if (clean) {
-            console.log("removing ", key, localStorage.getItem(key));
-            localStorage.removeItem(key);
-          } else {
-            console.log("ls ", key, localStorage.getItem(key));
-          }
-        }
-      };
-
-      document.addEventListener('DOMContentLoaded',function(){
+    function LoadSavedData(daters){
+        var sort = getUrlParameter('sort');
+        var author = getUrlParameter('author');
+        var dept = getUrlParameter('dept');
+        var fbr = null;
+        dates = SortList(daters,sort,author,dept);
+        viewModel = {
+          showSaved: ko.observable(true),
+          saves: dates,
+          requests: fbr
+        };
         ko.applyBindings(viewModel);
-      });
+    }
+
+      var initialEdits = [];
+      var viewModel;
+
+      dateFormat = function(unixdate) {
+        if (typeof unixdate == 'undefined') return 'DD-MM-YYYY';
+        var fullDate = new Date();
+        fullDate.setTime(ko.utils.unwrapObservable(unixdate));
+        var m = ""+(fullDate.getMonth()+1);
+        var h = ""+(fullDate.getHours());
+        var i = ""+(fullDate.getMinutes());
+        var d = ""+(fullDate.getDate());
+        var y = ""+(fullDate.getFullYear());
+        return m + "/" + (d.length == 1 ? '0' : '') + d + "/" + y + " " +(h.length == 1 ? '0' : '') + h + ":" + (i.length == 1 ? '0' : '') + i;
+      };
     </script>
     <style>
 body {
@@ -130,13 +105,33 @@ body {
 }
 
 a, a:link, a:visited {
-  color: #A00000;
+  color: #05203e;
   text-decoration: none;
 }
+a:hover{
+  color: #57a040;
+  font-size: 15;
+}
+
+a.th{
+  color:#ffffff;
+}
+a.th:hover{
+  color:#ffffff;
+}
+th:hover{
+  background-color: #57a040;
+}
+
+th.nohover:hover{
+  background-color: #05203e;
+}
+
+
 .template {
   margin: 10px;
   display: inline-block;
-  vertical-align: top; 
+  vertical-align: top;
 }
 .template a {
   display: block;
@@ -146,38 +141,70 @@ a, a:link, a:visited {
   height: 500px;
   overflow-y: auto;
 }
+/*
 .template a:hover {
-  outline: 5px solid #900000;
+  outline: 5px solid #1660e9;
+  transition: outline .2s;
+}*/
+
+.hovertemplate:hover{
+  outline: 5px solid #1660e9;
   transition: outline .2s;
 }
-#savedTable tbody tr:nth-child(odd) td {
+
+#savedTable {
+  min-width:550px;
+  padding: 5px;
+  background-color: #C9E2FF;
+}
+#savedTable  tbody tr:nth-child(odd) td {
   background-color: white;
 }
 #savedTable td {
   padding: 2px 5px ;
 }
+
+#featureTable {
+  min-width:550px;
+  padding: 5px;
+  background-color: #C9E2FF;
+}
+
+#featureTable tbody tr:nth-child(odd) td {
+  background-color: white;
+}
+#featureTable td {
+  padding: 2px 5px ;
+}
+
 .operationButton, .resumeButton {
-  background-color: #333332;
+  background-color: #003166;
   color: white !important;
   padding: 5px 8px;
   border-radius: 5px;
   display: inline-block;
 }
+
+.hangRight{
+  float:right;
+  margin-left: 10px;
+}
+
 .operationButton i {
   color: white;
 }
 .ribbon {
-  background-color: #900000;
+  background-color: #003166;
   color: white;
   display: inline-block;
   padding: 3px 10px;
   margin: 6px;
   position: relative;
   z-index: 10;
-  outline: 1px solid #600000;
+  outline: 1px solid #003166;
 }
 /* outline su firefox viene fuori dal content */
-@-moz-document url-prefix() { 
+@-moz-document url-prefix() {
   .ribbon {
      outline-color: transparent;
   }
@@ -191,7 +218,7 @@ a, a:link, a:visited {
   height: 0;
   border-width: 12px 12px;
   border-style: solid;
-  border-color: #900000;
+  border-color: #003166;
 }
 .ribbon:before {
   left: -20px;
@@ -217,9 +244,39 @@ a, a:link, a:visited {
   .byRibbon { display: inline !important; }
 }
 
-</style>
-<!-- stili per logo -->
-<style>
+input {
+  width: 20%;
+}
+
+.styled-select {
+   height: 29px;
+   overflow: hidden;
+   width: 240px;
+}
+
+.styled-select select {
+   background: transparent;
+   border: none;
+   font-size: 14px;
+   height: 29px;
+   padding: 5px; /* If you add too much padding here, the options won't show in IE */
+   width: 268px;
+}
+
+.styled-select.slate {
+   height: 34px;
+   width: 240px;
+}
+
+
+.styled-select.slate select {
+   font-size: 16px;
+   height: 34px;
+   width: 268px;
+}
+.blue    { background-color: transparent; }
+.blue select    { color: #fff; }
+
  .logoContainer { padding-bottom: 4px; }
  /*
  body.mo table.logoWrapper, #mosaico-logo { width: auto; border-bottom: 0; margin: auto; }
@@ -242,27 +299,27 @@ a, a:link, a:visited {
  #mosaico-logo .s9 {  transform: rotate(-10deg); }
  #mosaico-logo .on {  border: 0px solid #CCC; transition: transform .3s; -webkit-transition: transform .3s; }
  #mosaico-logo .on.cc:hover { transform: rotate(90deg) scale(1.3); box-shadow: 1px -1px 2px #888; }
- #mosaico-logo .ce {  background-color: #333332; border-color: #FFFFFF; }
+ #mosaico-logo .ce {  background-color: #05203e; border-color: #FFFFFF; }
  #mosaico-logo .cc {  box-shadow: 1px 1px 1px #555; position: relative; z-index: 2; }
- #mosaico-logo .c0 {  background-color: #EECC20; border-color: #CEAC00; }
- #mosaico-logo .c1 {  background-color: #DD8010; border-color: #BD6000; }
- #mosaico-logo .c2 {  background-color: #CC8010; border-color: #AC6000; }
- #mosaico-logo .c3 {  background-color: #BB7010; border-color: #9B5000; }
- #mosaico-logo .c4 {  background-color: #CC6010; border-color: #AC4000; }
- #mosaico-logo .c5 {  background-color: #A03020; border-color: #801000; }
- #mosaico-logo .c6 {  background-color: #CE1000; border-color: #AC1000; }
- #mosaico-logo .c7 {  background-color: #7E1000; border-color: #5E0000; }
- #mosaico-logo .c8 {  background-color: #A01020; border-color: #800000; }
- #mosaico-logo .c9 {  background-color: #EE4400; border-color: #CC2400; }
+ #mosaico-logo .c0 {  background-color: #1660e9; border-color: #CEAC00; }
+ #mosaico-logo .c1 {  background-color: #1660e9; border-color: #1660e9; }
+ #mosaico-logo .c2 {  background-color: #1c8b85; border-color: #1c8b85; }
+ #mosaico-logo .c3 {  background-color: #1c8b85; border-color: #9B5000; }
+ #mosaico-logo .c4 {  background-color: #1c8b85; border-color: #1c8b85; }
+ #mosaico-logo .c5 {  background-color: #ffffff; border-color: #ffffff; }
+ #mosaico-logo .c6 {  background-color: #003166; border-color: #003166; }
+ #mosaico-logo .c7 {  background-color: #ffffff; border-color: #ffffff; }
+ #mosaico-logo .c8 {  background-color: #ffffff; border-color: #ffffff; }
+ #mosaico-logo .c9 {  background-color: #003166; border-color: #003166; }
 </style>
 <!-- script per logo -->
 <script>
 var makeMosaicoTable = function() {
   var data = [
-  '#1## 7### 8##4 ##9# 1 #2## ##9#       ',
-  '#<#4 #  3 #^^  #  # # #    #  6  2 ##9',
-  '5<## #  #  ### 7### # 3    #  #  # # #',
-  '#<0# ##0# ###6 2  # # ##8# 5###<## ###'
+    '#1## 7### 8##4 ##9# 1 #2## ##9#',
+    '#<#4 #  3 #^^  #  # # #    #  6',
+    '5<## #  #  ### 7### # 3    #  #',
+    '#<0# ##0# ###6 2  # # ##8# 5###'
   ];
   var t = $('<table class="mosaico-text" id="mosaico-logo" />');
   var rnd1, rnd2, tr, className;
@@ -289,80 +346,233 @@ var makeMosaicoTable = function() {
   }
   return t;
 };
+
 $(function() {
   makeMosaicoTable().appendTo($('.logoContainer'));
   $('.logoImage').remove();
+  gimmedata();
 });
-// $('<hr/>').appendTo($('body'));
+
+function AddFeature() {
+  var featureType = $("#featureSelect").val();
+  var featureTitle = $("#featureTitleInput").val();
+  var featureDesc = $("#featureDescInput").val();
+  var featureAuthor = localStorage.getItem("username");
+  if(featureAuthor === null){
+    featureAuthor = "unknown";
+  }
+  var json = '{"type":"' + featureType + '","title":"' + featureTitle + '","desc":"' + featureDesc + '","requester":"' + featureAuthor + '","status":"not started"}';
+  $("#newFeatureFilename").val(NewHash());
+  $("#newFeatureJSON").val(json);
+  $("#newFeatureForm").submit();
+};
+
+function NewHash()
+{
+  return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
+}
+
+function createNewTemplate(templateName) {
+  var newid = NewHash();
+  window.location.href = "editor.html?template=" + templateName + "#" + newid;
+}
+
+function OpenFilterMenu(){
+  $("#filterMenu").show();
+  $("#preFilter").hide();
+}
+function OpenFeatureMenu(){
+  $("#featureMenu").show();
+  $("#preFeature").hide();
+}
+
+function Filter(){
+  var filter = $("#filterSelect").val();
+  var author = $("#authorInput").val();
+  var dept = $("#deptInput").val();
+  RedirectMe(filter,author,dept);
+}
+
+function TableHeadSort(sort)
+{
+  var author = getUrlParameter('author');
+  var dept = getUrlParameter('dept');
+  RedirectMe(sort,author,dept);
+}
+
+function RedirectMe(sort,author,dept)
+{
+  var request = "?";
+  if(sort === "" || typeof sort === 'undefined')
+    sort = 'time';
+  request += "sort=" + sort;
+  if(author !== "" && typeof author !== 'undefined')
+    request += "&author=" + author;
+  if(dept !== "" && typeof dept !== 'undefined')
+    request += "&dept=" + dept;
+    window.location = request;
+}
+
+$( document ).ready(function() {
+  $( "i" ).hover(function() {
+    $( this ).fadeOut( 200 );
+    $( this ).fadeIn( 500 );
+  });
+  $("#TemplatesDoneGoesHeres").load("backend-php/templates.php");
+
+  $( "#deptSelect" ).change(function() {
+    RedirectMe("","",$( "#deptSelect" ).val());
+  });
+
+});
+
+
 </script>
 
   </head>
-  <body style="overflow: auto; text-align: center; background-color: #3f3d33; padding: 0; margin: 0; display: none;" data-bind="visible: true">
-  <div style="background-color: #d2cbb1; padding: 10px;">
-    <table class="logoWrapper" valign="bottom" align="center"><tr><td valign="bottom"><img class="logoImage" alt="Mosaico.io" style="display: block;" src="dist/img/mosaicologo.png" /><div class="logoContainer"></div></td><td class="byTable" valign="bottom"><a href="http://www.voxmail.it"><img src="dist/img/byvoxmail.png" alt="by VOXmail" /></a></td></tr></table>
-    <div class="ribbon">opensource email template editor <span class="byRibbon" style="display: none;">by VOXmail</span></div>
+  <body style="overflow: auto; text-align: center; background-color: #003166; padding: 0; min-width:800px; margin: 0; display: none;" data-bind="visible: true">
+  <div style="background-color: #57a040; padding: 10px;">
+    <table class="logoWrapper" valign="bottom" align="center"><tr><td valign="bottom"><img class="logoImage" alt="Mosaico.io" style="display: block;" src="dist/img/mosaicologo.png" /><div class="logoContainer"></div></td><td class="byTable" valign="bottom"><a href="http://mattghall.com"><img src="dist/img/bymattg.png" alt="by matt g" /></a></td></tr></table>
+    <div class="ribbon"><span id="welcomeMsg">opensource email template editor</span><span class="byRibbon" style="display: none;">by m@g</span></div>
   </div>
-  <div class="disclaimer" style="position: absolute; top: 10px; right: 10px; width: 140px; padding: .5em; background-color: #900000; color: white; border: 2px dashed #d2cbb1">WARNING: experimental beta version, use with care!</div>
-    <!-- ko if: edits().length -->
-    <div style="overflow-y: auto; max-height: 200px; z-index: 10; position: relative; padding: 1em; background-color: #f1eee6;">
-    <!-- ko ifnot: $root.showSaved --><span>You have saved contents in this browser! <a class="resumeButton" href="#" data-bind="click: $root.showSaved.bind(undefined, true);"><i class="fa fa-plus-square"></i> Show</a></span><!-- /ko -->
-    <!-- ko if: $root.showSaved -->
-    <table id="savedTable" align="center" cellspacing="0" cellpadding="8" style="padding: 5px; ">
-    <caption>Email contents saved in your browser <a href="#" class="resumeButton" data-bind="click: $root.showSaved.bind(undefined, false);"><i class="fa fa-minus-square"></i> Hide</a></caption>
-      <thead><tr>
-        <th>Id</th><th>Name</th><th>Created</th><th>Last changed</th><th>Operations</th>
-      </tr></thead>
-    <tbody data-bind="foreach: edits">
-      <tr>
-        <td align="left"><a href="#" data-bind="attr: { href: 'editor.html#'+key }"><code>#<span data-bind="text: key">key</span></code></a></td>
-        <td style="font-weight: bold" align="left"><a href="#" data-bind="attr: { href: 'editor.html#'+key }"><span data-bind="text: name">versamix</span></a></td>
-        <td><span data-bind="text: typeof created !== 'undefined' ? $root.dateFormat(created) : '-'">YYYY-MM-DD</span></td>
-        <td><span style="font-weight: bold" data-bind="text: typeof changed !== 'undefined' ? $root.dateFormat(changed) : '-'">YYYY-MM-DD</span></td>
-        <td>
-        <a class="operationButton" href="#" data-bind="attr: { href: 'editor.html#'+key }" title="edit"><i class="fa fa-pencil"></i></a>
-        <!--(<a href="#" data-bind="click: $root.renameEdit.bind(undefined, $index())" title="rinomina"><i class="fa fa-trash-o"></i></a>)-->
-        <a class="operationButton" href="#" data-bind="click: $root.deleteEdit.bind(undefined, $index())" title="delete"><i class="fa fa-trash-o"></i></a>
-        </td>
-      </tr>
-    </tbody>
-    </table>
-    <!-- /ko -->
-    </div>
-    <!-- /ko -->
+  <div class="disclaimer" style="position: absolute; top: 10px; right: 10px; width: 140px; padding: .5em; background-color: #003166; color: white; border: 2px dashed #d2cbb1">WARNING: experimental beta version! Matt G. Hall made this so use with caution. <a style="color:white" href="http://mariners.com">Go Mariners!</a></div>
+
+
     <div class="content" style="background-color: white; margin-top: -20px; padding-top: 15px; background-origin: border; padding-bottom: 2em">
-    <h3>Try Mosaico first template: more to come soon, stay tuned!</h3>
-    <div data-bind="foreach: templates">
-      <div class="template template-xx" style="" data-bind="attr: { class: 'template template-'+name }">
-        <div class="description" style="padding-bottom:5px"><b data-bind="text: name">xx</b>: <span data-bind="text: desc">xx</span></div>
-        <a href="#" data-bind="click: $root.newEdit.bind(undefined, name), attr: { href: 'editor.html#templates/'+name+'/template-'+name+'.html' }">
-          <img src width="100%" alt="xx" data-bind="attr: { src: 'templates/'+name+'/edres/_full.png' }">
-        </a>
+      <div id="contentBoxes">
+        <div style="overflow-y: auto; z-index: 10; padding: 1em; margin:0;">
+          <h2 style="-webkit-margin-before:0px; -webkit-margin-after:0px;"> Saved Emails </h2>
+        <table id="savedTable" align="center" cellspacing="0" cellpadding="8">
+        <caption id="preFilter"><a href="?sort=time" class="resumeButton hangRight"><i class="fa fa-asterisk"></i> Show All</a>&nbsp;&nbsp;<a href="#" class="resumeButton hangRight" onclick="OpenFilterMenu()"><i class="fa fa-filter"></i> Filter</a></caption>
+        <caption id="filterMenu" style="display:none;">
+          <strong>Sort By: </strong>
+          <select id="filterSelect">
+            <option value="time">Last Modified</option>
+            <option value="project">Project</option>
+            <option value="dept">Department</option>
+            <option value="author">Assignee</option>
+          </select>
+          <strong>Owner: </strong> <input id="authorInput"></input>
+          <strong>Dept: </strong> <input id="deptInput"></input>
+          &nbsp;
+          <a href="#" class="resumeButton" onclick="Filter()"><i class="fa fa-filter"></i> Go</a>
+        </caption>
+          <thead><tr style="background-color: #05203e; color:#fff; text-align:left;">
+            <th class ="nohover">Id</th>
+            <th onclick="TableHeadSort('project')">Project&nbsp;<i class="fa fa-sort"></i></th>
+            <th>
+              <div class="styled-select blue">
+                <!-- TODO Replace with your Departments -->
+              <select id="deptSelect">
+                <option value="">Select a Department</option>
+                <option value="Academic Affairs">Academic Affairs</option>
+                <option value="Advancement Services">Advancement Services</option>
+                <option value="Affiliate Faculty">Affiliate Faculty</option>
+                <option value="Alumni">Alumni</option>
+                <option value="Art">Art</option>
+                <option value="Arts &amp; Sciences">Arts &amp; Sciences</option>
+                <option value="Athletics">Athletics</option>
+                <option value="Biology">Biology</option>
+                <option value="Budget &amp; Finance">Budget &amp; Finance</option>
+                <option value="Building Maintenance">Building Maintenance</option>
+                <option value="Business &amp; Finance">Business &amp; Finance</option>
+                <option value="Business Government Economics">Business Government Economics</option>
+                <option value="Casey Conference Center">Casey Conference Center</option>
+                <option value="Center Biblical Theologcl Educ">Center Biblical Theologcl Educ</option>
+                <option value="Center for Career &amp; Calling">Center for Career &amp; Calling</option>
+                <option value="Center for Learning">Center for Learning</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Clinical Psychology">Clinical Psychology</option>
+                <option value="Communication/Journalism">Communication/Journalism</option>
+                <option value="Computer &amp; Info Systems">Computer &amp; Info Systems</option>
+                <option value="Conference Services">Conference Services</option>
+                <option value="Controller">Controller</option>
+                <option value="Ctr for Scholarshp/Faculty Dev">Ctr for Scholarshp/Faculty Dev</option>
+                <option value="Education">Education</option>
+                <option value="Emeriti Faculty">Emeriti Faculty</option>
+                <option value="Engineering &amp; Computer Science">Engineering &amp; Computer Science</option>
+                <option value="English">English</option>
+                <option value="Enrollment Management &amp; Mrktng">Enrollment Management &amp; Mrktng</option>
+                <option value="Facility &amp; Project Management">Facility &amp; Project Management</option>
+                <option value="Family &amp; Consumer Science">Family &amp; Consumer Science</option>
+                <option value="Health &amp; Human Performance">Health &amp; Human Performance</option>
+                <option value="Health Sciences">Health Sciences</option>
+                <option value="Health Services">Health Services</option>
+                <option value="History">History</option>
+                <option value="Housekeeping">Housekeeping</option>
+                <option value="Housing &amp; Meal Plan Services">Housing &amp; Meal Plan Services</option>
+                <option value="Human Resources">Human Resources</option>
+                <option value="Industrial/Organizational Psyc">Industrial/Organizational Psyc</option>
+                <option value="Institutional Research">Institutional Research</option>
+                <option value="Languages Cultures Linguistics">Languages Cultures Linguistics</option>
+                <option value="Library">Library</option>
+                <option value="Mailing Services">Mailing Services</option>
+                <option value="Major Gifts">Major Gifts</option>
+                <option value="Marriage &amp; Family Therapy">Marriage &amp; Family Therapy</option>
+                <option value="Master of Fine Arts">Master of Fine Arts</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Multi-Ethnic Programs">Multi-Ethnic Programs</option>
+                <option value="Music">Music</option>
+                <option value="Office of the President">Office of the President</option>
+                <option value="Office of the Provost">Office of the Provost</option>
+                <option value="Perkins Center">Perkins Center</option>
+                <option value="Philosophy">Philosophy</option>
+                <option value="Physics">Physics</option>
+                <option value="Planning &amp; Administration">Planning &amp; Administration</option>
+                <option value="Political Science">Political Science</option>
+                <option value="Psychology">Psychology</option>
+                <option value="Psychology, Family &amp; Community">Psychology, Family &amp; Community</option>
+                <option value="Residence Life">Residence Life</option>
+                <option value="Retired Staff with Privileges">Retired Staff with Privileges</option>
+                <option value="SP Foundation">SP Foundation</option>
+                <option value="Safety &amp; Security">Safety &amp; Security</option>
+                <option value="Sociology">Sociology</option>
+                <option value="Stdnt Involvement &amp; Leadership">Stdnt Involvement &amp; Leadership</option>
+                <option value="Student Academic Services">Student Academic Services</option>
+                <option value="Student Counseling Center">Student Counseling Center</option>
+                <option value="Student Financial Services">Student Financial Services</option>
+                <option value="Student Life">Student Life</option>
+                <option value="TESOL Graduate Program">TESOL Graduate Program</option>
+                <option value="Theatre">Theatre</option>
+                <option value="Theology">Theology</option>
+                <option value="Univ Recruitment &amp; Admissions">Univ Recruitment &amp; Admissions</option>
+                <option value="University Advancement">University Advancement</option>
+                <option value="University Communications">University Communications</option>
+                <option value="University Ministries">University Ministries</option>
+                <option value="University Services">University Services</option>
+              </select>
+            </div></th>
+            <th onclick="TableHeadSort('author')">Owner&nbsp;<i class="fa fa-sort"></i></th>
+            <th onclick="TableHeadSort('time')">Created&nbsp;<i class="fa fa-sort"></i></th>
+            <th class = "nohover">Last Change</th>
+            <th class = "nohover">Changed On</th>
+            <th class = "nohover">Operations</th>
+          </tr></thead>
+        <tbody style="background-color: #C9E2FF;" data-bind="foreach: saves">
+          <tr>
+            <td align="left"><a href="#" data-bind="attr: { href: 'editor.html#'+hash }"><code>#<span data-bind="text: hash">key</span></code></a></td>
+            <td style="font-weight: bold" align="left"><a href="#" data-bind="attr: { href: 'editor.html#'+hash }"><span data-bind="text: name">xxxxx</span></a></td>
+            <td style="font-weight: bold" align="left"><a href="#" data-bind="attr: { href: 'editor.html#'+hash }"><span data-bind="text: dept"></span></a></td>
+            <td style="font-weight: bold" align="left"><a href="#" data-bind="attr: { href: 'editor.html#'+hash }"><span data-bind="text: author">xxxxx</span></a></td>
+            <td><span data-bind="text: dateFormat(dateCreated)">YYYY-MM-DD</span></td>
+            <td style="font-weight: bold" align="left"><a href="#" data-bind="attr: { href: 'editor.html#'+hash }"><span data-bind="text: lastChanger">xxxxx</span></a></td>
+            <td><span data-bind="text: dateFormat(lastEdit)">YYYY-MM-DD</span></td>
+            <td>
+              <a class="operationButton" title="delete" data-bind="attr: { href: 'backend-php/delete.php?hash='+hash }"><i class="fa fa-trash-o"></i></a>
+              <a class="operationButton" title="duplicate" data-bind="attr: { href: 'backend-php/duplicate.php?old='+ hash + '&new=' + NewHash() }"><i class="fa fa-files-o"></i></a>
+            </td>
+          </tr>
+        </tbody>
+        </table>
+        </div>
+        <h2> Create New Email </h2>
+        <div id="TemplatesDoneGoesHeres">
+          <!--This is where the Tempaltes will load-->
+        </div>
       </div>
     </div>
-    </div>
-    <div class="subscribe" style="background-color: #900000; color: white; padding: .5em">
-      <form action="http://mosaico.voxmail.it/user/register"  accept-charset="UTF-8" method="post">
-        <label>Stay up to date about Mosaico main news via email (No spam!): </label>
-        <input type="text" placeholder="email address" maxlength="64" name="mail" value="" class="form-text required" style="border: 0; padding: 5px 10px; box-sizing: border-box;"/>
-        <input type="submit" name="submit" value="Keep in touch!"  class="form-submit" style="background-color: #330000; color: white; border: 0; box-sizing: border-box; border-radius: 3px; padding: 5px 10px" />
-        <input type="hidden" name="form_id" value="user_register"  />
-      </form>
-    </div>
-    <div class="about" style="background-color: #f1eee6; color: #333332; padding: 1em;">
-      <h3>Why MOSAICO?</h3>
-      <p>Designing and coding an email that <strong>works on every device</strong> and every client is a <strong>daunting task</strong> even for professionals.</p>
-      <p>Mosaico allows you to realize <strong>a beautiful and effective template</strong> without a <strong>team of professionals</strong> and hours of testing to make sure it works everywhere.</p>
-      <h3>What does make Mosaico unique?</h3>
-      <p><strong>Responsive and tested Template</strong>, working with <strong>all major email clients and devices</strong></p>
-      <p><strong>Rapid graphic personalization</strong> of the overall theme</p>
-      <p><strong>Flexibility and style customization</strong> of single elements</p>
-      <p>Intuitive <strong>drag &amp; drop image upload</strong> and <strong>automatic resizing</strong> to fit available space</p>
-      <p><strong>Global undo/redo system</strong>: stop wasting time with saves, reviews and confirmations</p>
-      <p><strong>Custom templates support</strong>, with a simple template language (make your html design work on Mosaico in few hours)</p>
-      <p><strong>Open Source</strong>: Mosaico is distributed under the GPL license and the <a href="https://github.com/voidlabs/mosaico">complete code base</a> is available on GitHub</p>
-    </div>
-    <div class="footer" style="background-color: #3f3d33; color: #d2cbb1; padding: 1em">
-      Void Labs Snc 2015® - All rights reserved - P.IVA 02137700395
+    <div class="footer" style="background-color: #C9E2FF; color: #3f3d33; padding: 1em">
+      Version 1.1.3 last updated 2/16/17 by m@g
     </div>
   </body>
 </html>

@@ -1,0 +1,1211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width">
+  <meta name="format-detection" content="telephone=no" />
+  <title style="-ko-bind-text: @titleText">TITLE</title>
+  <style type="text/css">
+    @supports -ko-blockdefs {
+      id { widget: id }
+      size { label: Size; widget: select; options: 8|9|10|11|12|13|14|15|16|18|20|22|25|28|31; }
+      visible { label: Visible?; widget: boolean }
+      color { label: Color; widget: color }
+      radius {
+        label: Corner Radius;
+        widget: integer;
+        max: 20;
+        help: Attention - this property is not supported on all email clients (i.e. Outlook)
+      }
+      face { label: Font; widget: select; options: Arial, Helvetica, sans-serif=Arial|Arial Black, Arial Black, Gadget, sans-serif=Arial Black|Comic Sans MS, Comic Sans MS5, cursive=Comic Sans|Courier New, Courier New, monospace=Courier|Georgia, serif=Georgia|Impact, sans-serif=Impact|Lucida Console, Monaco, monospace=Lucida Console|Lucida Sans Unicode, Lucida Grande, sans-serif=Lucida Sans Unicode|Times New Roman, Times, serif=Times New Roman|Verdana, Geneva, sans-serif=Verdana}
+      decoration { label: Decoration; widget: select; options: none=None|underline=Underline }
+      linksColor { label: Link Color; extend: color }
+      linksDecoration { label: Underlined Links?; extend: decoration }
+      buttonColor { label: Button Color; extend: color }
+      text { label: Paragraph; widget: text }
+      url { label: Link; widget: url }
+      src { label: Image; widget: src }
+      hrWidth { label: Width; widget: select; options:10|20|30|40|50|60|70|80|90|100; }
+      hrHeight { label: Line height; widget: integer; max: 80; }
+
+      height { label: Height; widget: integer }
+      imageHeight { label: Image Height; extend: height; }
+      spacerSize { label: Height; widget: integer; max: 90; min: 4; }
+      align { label: Alignment; widget: select; options:left=Left|right=Right|center=Center}
+      alt {
+        label: Alternative Text;
+        widget: text;
+        help: Alternative text will be shown on email clients that does not download image automatically;
+      }
+      sponsor { label: Sponsor; properties: visible=true src url alt; category: hidden }
+      titleText {label:Title Text;category: hidden;}
+      gutterVisible { label: Show Gutter; extend: visible }
+      socialIconType { label: Icon Version;widget: select; options:bw=Black and White|colors=Colors; }
+
+      preheaderLinkOption {
+        label: Unsubscribe Link;
+        widget: select;
+        options: [profile_link]=Profile|[unsubscribe_link]=Unsubscribe|none=None;
+        help: If -None- is selected, preHeader text will be shown;
+      }
+
+      hrStyle { label: Separator Style;properties:color hrWidth hrHeight; }
+      hrStyle:preview { height: 200%; width: 200%; bottom: 20px; -ko-border-bottom: @[hrHeight]px solid @color; }
+      preheaderVisible { label: Show Preheader; extend: visible; help: Preheader block is the first one on the top of the page. It contains web version link and optionally unsubscribe link or a preheader text that will be shown as a preview on some email clients; }
+
+      /* content types */
+      blocks { label: Blocks; properties: blocks[]; }
+      link { label: Link; properties: text url }
+      image { label: Image; properties: src url alt }
+      backgroundColor { label: Background Color; extend: color }
+      buttonLink { label: Button; extend: link }
+
+      /* texts and links */
+      textStyle { label: Text; properties: face color size }
+      textStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-font-size: @[size]px; }
+      linkStyle { label: Link; properties: face color size decoration=none }
+      linkStyle:preview { -ko-bind-text: @['Link']; -ko-font-size: @[size]px; -ko-font-family: @face; -ko-text-decoration: @[decoration] }
+      longTextStyle { label: Paragraph; properties: face color size linksColor   }
+      longTextStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-font-size: @[size]px; }
+      bigButtonStyle { label: Big Button; extend: buttonStyle }
+      titleTextStyle { label: Title; extend: textStyle }
+      /* background */
+      externalBackgroundColor { label: External Background; extend: color }
+
+      externalTextStyle { label: Alternative Text; extend: textStyle }
+      externalTextStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-font-size: @[size]px; }
+
+      bigTitleStyle { label: Title; properties: face color size align}
+      bigTitleStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-font-size: @[size]px; }
+      /* buttons */
+      buttonStyle color { label: Text Color; extend: color }
+      buttonStyle size { label: Text Size; extend: size }
+      buttonStyle { label: Button; properties: face color size buttonColor radius }
+      buttonStyle:preview { -ko-bind-text: @['Button']; -ko-font-family: @face; -ko-font-size: @[size]px; -ko-background-color: @buttonColor; padding-left: 5px; -ko-border-radius: @[radius]px; }
+
+      /* contents */
+      preheaderText {label: PreHeader Text; extend:text; help: This text will be shown on some email clients as a preview of the email contents;}
+      leftImage { label: Left Image; extend: image }
+      leftLongText { label: Left Text; extend: text }
+      leftButtonLink { label: Left Button; extend: buttonLink }
+      middleImage { label: Central Image; extend: image }
+      middleLongText { label: Central Text; extend: text }
+      middleButtonLink { label: Central Button; extend: buttonLink }
+      rightImage { label: Right Image; extend: image }
+      rightLongText { label: Right Text; extend: text }
+      rightButtonLink { label: Right Button; extend: buttonLink }
+      webversionText{ label: Web Link Text; extend: text;}
+      unsubscribeText{ label: Unsubscribe Link; extend: text;}
+
+      titleVisible { label: Show Title; extend: visible; }
+      buttonVisible { label: Show Button; extend: visible; }
+      imageVisible { label: Show Image; extend: visible; }
+
+      contentTheme { label: Main Style; }
+      contentTheme:preview { -ko-background-color: @[backgroundColor] }
+      frameTheme { label: Frame Style; }
+      frameTheme:preview { -ko-background-color: @[backgroundColor] }
+      template preheaderText { label: Preheader; }
+
+      template { label: Page; theme: frameTheme ;properties:  preheaderVisible=true; version: 1.0.5; }
+
+      preheaderBlock { label:Preheader Block;  theme: frameTheme}
+
+      sideArticleBlock imagePos {label:Image position;widget:select; options: left=Left|right=Right; }
+      sideArticleBlock imageWidth { label: Image Size; widget: select; options: 120=Small|166=Medium|258=Big; }
+      sideArticleBlock { label: Image+Text Block; properties: backgroundColor titleVisible=true buttonVisible=false imageWidth=166 imagePos=left titleTextStyle longTextStyle buttonStyle  image  longText buttonLink; variant:imagePos; theme: contentTheme }
+
+      featureArticleBlock imagePos {label:Image position;widget:select; options: left=Left|right=Right; }
+      featureArticleBlock imageWidth { label: Image Size; widget: select; options: 120=Small|166=Medium|258=Big; }
+      featureArticleBlock { label: Image+Text Block; properties: backgroundColor titleVisible=true buttonVisible=false imageWidth=166 imagePos=left titleTextStyle longTextStyle buttonStyle  image  longText buttonLink; variant:imagePos; theme: contentTheme }
+
+      textBlock { label: Text Block; properties: backgroundColor titleVisible=true longTextStyle longText; theme: contentTheme}
+
+      singleArticleBlock { label: Image/Text Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true titleTextStyle longTextStyle buttonStyle  image  longText buttonLink;theme: contentTheme}
+
+      doubleArticleBlock { label: 2 Columns Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true titleTextStyle longTextStyle buttonStyle  leftImage  leftLongText leftButtonLink rightImage  rightLongText rightButtonLink; theme: contentTheme}
+
+      tripleArticleBlock { label: 3 Columns Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true titleTextStyle longTextStyle buttonStyle  leftImage  leftLongText leftButtonLink middleImage  middleLongText middleButtonLink rightImage  rightLongText rightButtonLink; theme: contentTheme}
+
+      titleBlock { label: Title; theme: contentTheme}
+      issueBlock { label: Issue; theme: contentTheme}
+      headerBanner { label: Header Banner; theme: contentTheme}
+      standardFooter { label: SPU Email Footer; theme: contentTheme}
+
+      imageBlock longTextStyle {
+        label: Alternative Text;
+        help: Some Email Clients will show this text if automatical download of images is disabled;
+      }
+      imageBlock { label: Image; properties: gutterVisible=false; variant: gutterVisible; theme: contentTheme }
+
+      doubleImageBlock longTextStyle {
+        label: Alternative Text;
+        help: Some Email Clients will show this text if automatical download of images is disabled;
+      }
+      doubleImageBlock { label: Two Image Gallery Block; properties: gutterVisible=false; variant: gutterVisible; theme: contentTheme }
+
+      tripleImageBlock longTextStyle {
+        label: Alternative Text;
+        help: Some Email Clients will show this text if automatical download of images is disabled;
+      }
+      tripleImageBlock { label: Three Image Gallery Block;properties:gutterVisible=false;variant:gutterVisible; theme: contentTheme}
+
+      buttonBlock { label: Button Block; properties: link; theme: contentTheme}
+      hrBlock { label: Separator Block;  theme: contentTheme}
+      spacerBlock { label: Spacer Block;  theme: contentTheme}
+
+      spacerBlock:preview,
+      preheaderBlock:preview,
+      hrBlock:preview,
+      featureArticleBlock:preview,
+      sideArticleBlock:preview,
+      textBlock:preview,
+      singleArticleBlock:preview,
+      doubleArticleBlock:preview,
+      tripleArticleBlock:preview,
+      titleBlock:preview,
+      issueBlock:preview,
+      headerBanner:preview,
+      standardFooter:preview,
+      buttonBlock:preview,
+      socialshareBlock:preview { -ko-background-color: @[backgroundColor] }
+    }
+  </style>
+  <style type="text/css" data-inline="true">
+    body { Margin: 0; padding: 0; }
+    img { border: 0px; display: block; }
+
+    a {
+      color:#7f1335;
+    }
+
+    .socialLinks { font-size: 6px; }
+    .socialLinks a {
+      display: inline-block;
+    }
+    .socialIcon {
+      display: inline-block;
+      vertical-align: top;
+      padding-bottom: 0px;
+      border-radius: 100%;
+    }
+    .oldwebkit { max-width: 600px; }
+    td.vb-outer { padding-left: 9px; padding-right: 9px; }
+    table.vb-container, table.vb-row, table.vb-content {
+      border-collapse: separate;
+    }
+    table.vb-row {
+      border-spacing: 9px;
+    }
+    table.vb-row.halfpad {
+      border-spacing: 0;
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+    table.vb-row.fullwidth {
+      border-spacing: 0;
+      padding: 0;
+    }
+    table.vb-container {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    table.vb-container.fullpad {
+      border-spacing: 18px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    table.vb-container.halfpad {
+      border-spacing: 9px;
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+    table.vb-container.fullwidth {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .imgCont{
+      width:184px;
+      min-width: 184px;
+    }
+  </style>
+  <style type="text/css">
+    /* yahoo, hotmail */
+    .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+    .yshortcuts a { border-bottom: none !important; }
+    .vb-outer { min-width: 0 !important; }
+    .RMsgBdy, .ExternalClass {
+      width: 100%;
+      background-color: #202020;
+      -ko-background-color: @[_theme_.frameTheme.backgroundColor]
+    }
+
+    /* outlook */
+    table { mso-table-rspace: 0pt; mso-table-lspace: 0pt; }
+    #outlook a { padding: 0; }
+    img { outline: none; text-decoration: none; border: none; -ms-interpolation-mode: bicubic; }
+    a img { border: none; }
+  </style>
+
+  <!-- Outlook Specific Style -->
+  <!--[if gte mso 14]>
+    <style type="text/css">
+    /* Your Outlook-specific CSS goes here. */
+    .outlookSucks{
+      margin-right: 15px;
+    }
+    </style>
+  <![endif]-->
+  <!--[if gte mso 15]>
+    <style type="text/css">
+    /* Your Outlook-specific CSS goes here. */
+    .outlookSucks{
+      margin-right: 15px;
+    }
+    </style>
+  <![endif]-->
+
+
+
+<!--DontPreMailThis
+  <style type="text/css" data-premailer="ignore">
+      @media screen and (max-device-width: 600px), screen and (max-width: 600px) {
+      table.vb-container, table.vb-row {
+        width: 95% !important;
+      }
+
+      .mobile-hide { display: none !important; }
+      .mobile-textcenter { text-align: center !important; }
+
+      .mobile-full {
+        float: none !important;
+        width: 100% !important;
+        max-width: none !important;
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+      }
+      img.mobile-full {
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+      }
+    }
+
+    @media screen and (max-width: 600px){
+      .special-img{
+        width: 40%;
+        margin-bottom: 20px;
+      }
+    }
+
+    @media screen and (max-width: 500px){
+      .feature-img{
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+
+    @media screen and (max-width: 350px){
+      .special-img{
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+  /DontPreMailThis-->
+
+  <style type="text/css" data-inline="true">
+    [data-ko-block=tripleArticleBlock] .links-color a,
+    [data-ko-block=tripleArticleBlock] .links-color a:link,
+    [data-ko-block=tripleArticleBlock] .links-color a:visited,
+    [data-ko-block=tripleArticleBlock] .links-color a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=tripleArticleBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=tripleArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=tripleArticleBlock] .long-text p:first-child { Margin-top: 0px; }
+
+    [data-ko-block=doubleArticleBlock] .links-color a,
+    [data-ko-block=doubleArticleBlock] .links-color a:link,
+    [data-ko-block=doubleArticleBlock] .links-color a:visited,
+    [data-ko-block=doubleArticleBlock] .links-color a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=doubleArticleBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=doubleArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=doubleArticleBlock] .long-text p:first-child { Margin-top: 0px; }
+
+    [data-ko-block=singleArticleBlock] .links-color a,
+    [data-ko-block=singleArticleBlock] .links-color a:link,
+    [data-ko-block=singleArticleBlock] .links-color a:visited,
+    [data-ko-block=singleArticleBlock] .links-color a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=singleArticleBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=singleArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=singleArticleBlock] .long-text p:first-child { Margin-top: 0px; }
+
+    [data-ko-block=textBlock] .links-color a,
+    [data-ko-block=textBlock] .links-color a:link,
+    [data-ko-block=textBlock] .links-color a:visited,
+    [data-ko-block=textBlock] .links-color a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=textBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=textBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=textBlock] .long-text p:first-child { Margin-top: 0px; }
+
+    [data-ko-block=featureArticleBlock] .links-color a,
+    [data-ko-block=featureArticleBlock] .links-color a:link,
+    [data-ko-block=featureArticleBlock] .links-color a:visited,
+    [data-ko-block=featureArticleBlock] .links-color a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=featureArticleBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=featureArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=featureArticleBlock] .long-text p:first-child { Margin-top: 0px; }
+
+    [data-ko-block=sideArticleBlock] .links-color a,
+    [data-ko-block=sideArticleBlock] .links-color a:link,
+    [data-ko-block=sideArticleBlock] .links-color a:visited,
+    [data-ko-block=sideArticleBlock] .links-color a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=sideArticleBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=sideArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=sideArticleBlock] .long-text p:first-child { Margin-top: 0px; }
+
+    [data-ko-block=doubleImageBlock] a,
+    [data-ko-block=doubleImageBlock] a:link,
+    [data-ko-block=doubleImageBlock] a:visited,
+    [data-ko-block=doubleImageBlock] a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=tripleImageBlock] a,
+    [data-ko-block=tripleImageBlock] a:link,
+    [data-ko-block=tripleImageBlock] a:visited,
+    [data-ko-block=tripleImageBlock] a:hover {
+      text-decoration: underline;
+    }
+    [data-ko-block=buttonBlock] .links-color a,
+    [data-ko-block=buttonBlock] .links-color a:link,
+    [data-ko-block=buttonBlock] .links-color a:visited,
+    [data-ko-block=buttonBlock] .links-color a:hover {
+      text-decoration: none;
+    }
+    [data-ko-block=imageBlock] a,
+    [data-ko-block=imageBlock] a:link,
+    [data-ko-block=imageBlock] a:visited,
+    [data-ko-block=imageBlock] a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body bgcolor="#3f3f3f" text="#919191" alink="#cccccc" vlink="#cccccc" style="background-color: #f7f7f7; color: #000000;">
+
+  <center>
+
+  <div data-ko-container="main" data-ko-wrap="false">
+
+<!-- HeaderBanner -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="headerBanner">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-container halfpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td bgcolor="#ffffff" align="left">
+                            <a href="http://spu.edu/">
+                                <img src="https://spu.edu/images/global_header_images/torch-spu-mobile.png" width="250" alt="Seattle Pacific University" align="left">
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /HeaderBanner -->
+
+  <!-- imageBlock  -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;
+   " data-ko-block="imageBlock">
+    <tr>
+        <td class="vb-outer" valign="top" align="center">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table data-ko-display="gutterVisible eq false" width="600" class="vb-container fullwidth" cellpadding="0" border="0" bgcolor="#ffffff" align="center" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor;">
+                    <tr>
+                        <td valign="top" align="center">
+                            <a data-ko-link="image.url" href="" style="text-decoration: none;"><img data-ko-editable="image.src" hspace="0" border="0" vspace="0" width="600" data-ko-placeholder-height="200" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=600%2C200" class="mobile-full" alt="" style="max-width: 600px; display: block; border-radius: 0px; width: 100%; height: auto; font-size: 14px;
+                  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020;
+                  -ko-attr-alt: @image.alt;" /></a>
+                        </td>
+                    </tr>
+                </table>
+                <table data-ko-display="gutterVisible" width="600" class="vb-container fullpad" cellpadding="0" border="0" bgcolor="#ffffff" align="center" cellspacing="18" style="width: 100%; max-width: 600px; background-color: #ffffff; display: none;">
+                    <tr>
+                        <td valign="top" align="center">
+                            <a data-ko-link="image.url" href="" style="text-decoration: none;"><img data-ko-editable="image.src" hspace="0" border="0" vspace="0" width="534" data-ko-placeholder-height="280" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=534%2C280" class="mobile-full" alt="" style="max-width: 534px; display: block; border-radius: 0px; width: 100%; height: auto; font-size: 14px;
+                  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020;
+                  -ko-attr-alt: @image.alt;" /></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- imageBlock -->
+
+<!-- IssueBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="issueBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-container halfpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td bgcolor="#ffffff" align="left">
+                            <span data-ko-editable="text" style="color: #888888; font-family: Helvetica, Arial, sans-serif; font-size: 12px; line-height: 5px; margin: 0;">June 2016 &nbsp; |&nbsp; Volume 10, Issue 6</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /IssueBlock -->
+
+<!-- featureArticleBlock  -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="featureArticleBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align=0"center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td align="center" class="mobile-row" valign="top" style="font-size: 0;">
+                            <table align="center" border="0" cellspacing="0" cellpadding="0">
+                              <tr>
+
+                    <!-- Edited--><td align="left" valign="top" width="100%">
+                                      <div style="display:inline-block; vertical-align:top; width:100%;">
+                                          <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="100%" style="width: 100%;" align="left">
+                                              <tr>
+                                                  <td >
+                                                    <a data-ko-link="image.url" href="">
+                                                        <img class="feature-img outlookSucks" data-ko-editable="image.src" border="0" hspace="0" vspace="0" width="200" align="left" data-ko-placeholder-height="156" alt="" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=200%2C156" style="vertical-align: top; height: auto;  -ko-attr-alt: @image.alt; align:left;" />
+                                                    </a>
+                                                    <span data-ko-display="titleVisible" style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                                      <a data-ko-link="link.url" href="" style="color: #202020;">
+                                                        <span style="color: #202020;  text-align:center;" data-ko-editable="titleText" class="titleSpan">
+                                                        Title
+                                                        </span>
+                                                      </a>
+                                                    </span>
+                                                    <div style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="longText" class="long-text links-color rte">
+                                                    <p>
+                                                      Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.
+                                                      Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.
+                                                      Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.
+                                                    </p>
+                                                  </div>
+                                                  </td>
+                                                </tr>
+                                          </table>
+                                      </div>
+                                    </td>
+                                </tr>
+                          </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /featureArticleBlock -->
+
+<!-- sideArticleBlock  -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="sideArticleBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align=0"center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td align="center" class="mobile-row" valign="top" style="font-size: 0;">
+                            <table align="center" border="0" cellspacing="0" cellpadding="0">
+                              <tr>
+                    <!-- Edited--><td align="left" valign="top" width="100%">
+                                      <div style="display:inline-block; vertical-align:top; width:100%;">
+                                          <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="100%" style="width: 100%;" align="left">
+                                              <tr>
+                                                  <td>
+                                                    <a data-ko-link="image.url" href="">
+                                                        <img class="special-img outlookSucks" data-ko-editable="image.src" border="0" hspace="0" vspace="0" width="166" align="left" data-ko-placeholder-height="130" alt="" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=166%2C130" style="vertical-align: top; height: auto;  -ko-attr-alt: @image.alt; align:left; padding-bottom:0px" />
+                                                    </a>
+                                                    <span data-ko-display="titleVisible" style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                                      <a data-ko-link="link.url" href="" style="color: #202020;">
+                                                        <span style="color: #202020;  text-align:center;" data-ko-editable="titleText" class="titleSpan">
+                                                        Title
+                                                        </span>
+                                                      </a>
+                                                    </span>
+                                                    <div style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="longText" class="long-text links-color rte">
+                                                      <p>
+                                                      Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.
+                                                      Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.
+                                                      Far far away, behind the word mountains, far from the countries, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.
+                                                      </p>
+                                                   </div>
+                                                  </td>
+                                                </tr>
+                                          </table>
+                                      </div>
+                                    </td>
+                                </tr>
+                          </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /sideArticleBlock -->
+
+<!-- TitleBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="titleBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-container halfpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td bgcolor="#ffffff" align="center" style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:center;">
+                            <span data-ko-editable="text">Section Title</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /TitleBlock -->
+
+  <!-- spacerBlock -->
+  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7"
+    style="background-color: #f7f7f7;" data-ko-block="spacerBlock">
+    <tr>
+      <td class="vb-outer" valign="top" align="center" bgcolor="#f7f7f7" height="24"
+        style="-ko-attr-height: @spacerSize; height: 24px; -ko-height: @[spacerSize]px; background-color: #f7f7f7; -ko-background-color: @externalBackgroundColor;
+        -ko-attr-bgcolor: @externalBackgroundColor; font-size:1px; line-height: 1px;">&nbsp;</td>
+    </tr>
+  </table>
+  <!-- /spacerBlock -->
+
+   <!-- hrBlock -->
+  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7"
+    style="background-color: #f7f7f7;" data-ko-block="hrBlock">
+    <tr>
+      <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7"
+        style="background-color: #f7f7f7;">
+<!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+        <div class="oldwebkit">
+        <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-container halfpad" bgcolor="#ffffff"
+          style="width: 100%; max-width: 600px; background-color: #ffffff;">
+          <tr>
+            <td valign="top" bgcolor="#ffffff" style="background-color: #ffffff;
+              " align="center">
+              <table width="100%" cellspacing="0" cellpadding="0" border="0"
+                style="width:100%; -ko-width: @[hrStyle.hrWidth]%; -ko-attr-width: @[hrStyle.hrWidth]%">
+                <tr>
+                  <td width="100%" height="1" style="font-size:1px; line-height: 1px; width: 100%; background-color: #202020;
+                  -ko-background-color: @hrStyle.color; -ko-attr-height: @hrStyle.hrHeight; -ko-line-height: @[hrStyle.hrHeight]px">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        </div>
+<!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+  <!-- /hrBlock -->
+
+<!-- textBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="textBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr data-ko-display="titleVisible">
+                        <td style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                            <a data-ko-link="link.url" href="" style="color: #202020;">
+                                <span style="color: #202020;" data-ko-editable="titleText">
+                                    Awesome Title
+                                </span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="longText" class="long-text links-color">
+                            <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p>
+                            <p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /textBlock -->
+
+
+<!-- doubleArticleBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="doubleArticleBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td align="center" valign="top" style="font-size: 0">
+                            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]-->
+                            <div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%" align="left">
+                                    <tr data-ko-display="imageVisible">
+                                        <td width="100%" align="left" class="links-color" style="padding-bottom: 9px">
+                                            <a data-ko-link="leftImage.url">
+                                                <img data-ko-editable="leftImage.src" border="0" hspace="0" vspace="0" width="258" height="100" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=258%2C100" class="mobile-full" alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;
+                              -ko-attr-alt: @leftImage.alt" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="titleVisible">
+                                        <td style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                            <span style="color: #202020;" data-ko-editable="leftTitleText">
+                                              Awesome Title
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left" style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="leftLongText" class="long-text links-color">
+                                            <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="buttonVisible">
+                                        <td valign="top">
+                                            <table cellpadding="0" border="0" align="center" cellspacing="0" class="mobile-full" style="width:100%; padding-top: 4px">
+                                              <tr>
+                                                <td width="auto" valign="middle" bgcolor="#7f1335" align="center" height="50" nowrap="nowrap" style="font-size:14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; font-weight: bold; padding-left: 14px; padding-right: 14px; background-color: #7f1335; border-radius: 4px;">
+                                                    <a data-ko-link="leftButtonLink.url" href="" style="text-decoration: none; color: #ffffff; font-weight: bold;">
+                                                        <span data-ko-editable="leftButtonLink.text" style="color: #ffffff;">
+                                                           Click Me!
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                              </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="276">
+<![endif]-->
+                            <div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%" align="right">
+                                    <tr data-ko-display="imageVisible">
+                                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">
+                                            <a data-ko-link="rightImage.url">
+                                                <img data-ko-editable="rightImage.src" border="0" hspace="0" vspace="0" width="258" height="100" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=258%2C100" class="mobile-full" alt=""
+                                                style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;  -ko-attr-alt: @rightImage.alt" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="titleVisible">
+                                        <td style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                            <span style="color: #202020;" data-ko-editable="rightTitleText">
+                                              Awesome Title
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left" style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="rightLongText" class="long-text links-color">
+                                            <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="buttonVisible">
+                                        <td valign="top">
+                                            <table cellpadding="0" border="0" align="center" cellspacing="0" class="mobile-full" style="width:100%; padding-top: 4px">
+                                              <tr>
+                                                <td width="auto" valign="middle" bgcolor="#7f1335" align="center" height="50" nowrap="nowrap" style="font-size:14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; font-weight: bold; padding-left: 14px; padding-right: 14px; background-color: #7f1335; border-radius: 4px;">
+                                                    <a data-ko-link="rightButtonLink.url" href="" style="text-decoration: none; color: #ffffff; font-weight: bold;">
+                                                        <span data-ko-editable="rightButtonLink.text" style="color: #ffffff;">
+                                                           Click Me!
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                              </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]></tr></table><![endif]-->
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /doubleArticleBlock -->
+
+  <!-- tripleArticleBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="tripleArticleBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td align="center" valign="top" class="mobile-row" style="font-size: 0">
+                            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]-->
+                            <div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%" align="left">
+                                    <tr data-ko-display="imageVisible">
+                                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">
+                                            <a data-ko-link="leftImage.url" href="">
+                                                <img data-ko-editable="leftImage.src" border="0" hspace="0" vspace="0" width="166" height="90" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=166%2C90" class="mobile-full" alt=""
+                                                style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;
+                               -ko-attr-alt: @leftImage.alt" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="titleVisible">
+                                        <td style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                            <span style="color: #202020;" data-ko-editable="leftTitleText">
+                                              Awesome Title
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left" style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="leftLongText" class="long-text links-color">
+                                            <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="buttonVisible">
+                                        <td valign="top">
+                                            <table cellpadding="0" border="0" align="center" cellspacing="0" class="mobile-full" style="width:100%; padding-top: 4px">
+                                              <tr>
+                                                <td width="auto" valign="middle" bgcolor="#7f1335" align="center" height="50" nowrap="nowrap" style="font-size:14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; font-weight: bold; padding-left: 14px; padding-right: 14px; background-color: #7f1335; border-radius: 4px;">
+                                                    <a data-ko-link="leftButtonLink.url" href="" style="text-decoration: none; color: #ffffff; font-weight: bold;">
+                                                        <span data-ko-editable="leftButtonLink.text" style="color: #ffffff;">
+                                                           Click Me!
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                              </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="184">
+<![endif]-->
+                            <div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%" align="left">
+                                    <tr data-ko-display="imageVisible">
+                                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">
+                                            <a data-ko-link="middleImage.url">
+                                                <img data-ko-editable="middleImage.src" border="0" hspace="0" vspace="0" width="166" height="90" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=166%2C90" class="mobile-full" alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;
+                              -ko-attr-alt: @middleImage.alt" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="titleVisible">
+                                        <td style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                            <span style="color: #202020;" data-ko-editable="middleTitleText">
+                                              Awesome Title
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left" style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="middleLongText" class="long-text links-color">
+                                            <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="buttonVisible">
+                                        <td valign="top">
+                                            <table cellpadding="0" border="0" align="center" cellspacing="0" class="mobile-full" style="width:100%; padding-top: 4px">
+                                                <tr>
+                                                  <td width="auto" valign="middle" bgcolor="#7f1335" align="center" height="50" nowrap="nowrap" style="font-size:14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; font-weight: bold; padding-left: 14px; padding-right: 14px; background-color: #7f1335; border-radius: 4px;">
+                                                      <a data-ko-link="middleButtonLink.url" href="" style="text-decoration: none; color: #ffffff; font-weight: bold;">
+                                                          <span data-ko-editable="middleButtonLink.text" style="color: #ffffff;">
+                                                             Click Me!
+                                                          </span>
+                                                      </a>
+                                                  </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="184">
+<![endif]-->
+                            <div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%" align="right">
+                                    <tr data-ko-display="imageVisible">
+                                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">
+                                            <a data-ko-link="rightImage.url">
+                                                <img data-ko-editable="rightImage.src" border="0" hspace="0" vspace="0" width="166" height="90" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=166%2C90" class="mobile-full" alt=""
+                                                style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;-ko-attr-alt: @rightImage.alt" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="titleVisible">
+                                        <td style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                            <span style="color: #202020;" data-ko-editable="rightTitleText">
+                                              Awesome Title
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left" style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="rightLongText" class="long-text links-color">
+                                            <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>
+                                        </td>
+                                    </tr>
+                                    <tr data-ko-display="buttonVisible">
+                                        <td valign="top">
+                                            <table cellpadding="0" border="0" align="center" cellspacing="0" class="mobile-full" style="width:100%; padding-top: 4px">
+                                                <tr>
+                                                    <td width="auto" valign="middle" bgcolor="#7f1335" align="center" height="50" nowrap="nowrap" style="font-size:14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; font-weight: bold; padding-left: 14px; padding-right: 14px; background-color: #7f1335; border-radius: 4px;">
+                                                        <a data-ko-link="rightButtonLink.url" href="" style="text-decoration: none; color: #ffffff; font-weight: bold;">
+                                                            <span data-ko-editable="rightButtonLink.text" style="color: #ffffff;">
+                                                               Click Me!
+                                                            </span>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]></tr></table><![endif]-->
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /tripleArticleBlock -->
+
+
+
+  <!-- buttonBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="buttonBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr>
+                        <td valign="top" bgcolor="#ffffff" style="background-color: #ffffff;" align="center">
+                            <table cellpadding="0" border="0" align="center" cellspacing="0" class="mobile-full">
+                                <tr>
+                                    <td width="auto" valign="middle" bgcolor="#7f1335" align="center" height="50" nowrap="nowrap" style="font-size:14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; font-weight: bold;
+                    padding-left: 14px; padding-right: 14px; background-color: #7f1335; border-radius: 4px;">
+                                        <!--<a data-ko-link="link.url" data-ko-editable="link.text" href="" style="text-decoration: none; color: #ffffff; font-weight: bold;">BUTTON</a>-->
+                                        <a data-ko-link="link.url" href="" style="text-decoration: none; color: #ffffff; font-weight: bold;">
+                                            <span data-ko-editable="link.text" style="color: #ffffff;">
+                                               Click Me!
+                                            </span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /buttonBlock -->
+
+
+  <!-- doubleImageBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="doubleImageBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table data-ko-display="gutterVisible eq false" width="600" class="vb-container fullwidth" cellpadding="0" border="0" bgcolor="#ffffff" align="center" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor;">
+                    <tr>
+                        <td valign="top" align="center" class="mobile-row" style="font-size: 0">
+                            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]><td align="left" valign="top" width="285"><![endif]-->
+                            <div style="display:inline-block; max-width:285px; vertical-align:top; width:100%; width:100%; " class="mobile-full">
+                                <a data-ko-link="leftImage.url" href="" style="text-decoration: none;"><img data-ko-editable="leftImage.src" hspace="0" align="left" border="0" vspace="0" width="285" height="180" class="mobile-full" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=285%2C180" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020;-ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="285">
+<![endif]-->
+                            <div style="display:inline-block; max-width:285px; vertical-align:top; width:100%; width:100%; " class="mobile-full">
+                                <a data-ko-link="rightImage.url" href="" style="text-decoration: none;"><img data-ko-editable="rightImage.src" hspace="0" align="right" border="0" vspace="0" width="285" height="180" class="mobile-full" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=285%2C180" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020;-ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]></tr></table><![endif]-->
+                        </td>
+                    </tr>
+                </table>
+                <table data-ko-display="gutterVisible" width="600" class="vb-row fullpad" border="0" cellpadding="0" cellspacing="9" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff; display: none;">
+                    <tr>
+                        <td align="center" valign="top" bgcolor="#ffffff" style="background-color: #ffffff; font-size: 0">
+                            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]-->
+                            <div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" width="276" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="left">
+                                    <tr>
+                                        <td valign="top">
+                                            <a data-ko-link="leftImage.url" href="" style="text-decoration: none;">
+                                                <img data-ko-editable="leftImage.src" hspace="0" align="left" border="0" vspace="0" width="258" height="180" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=258%2C180" class="mobile-full" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020; -ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="276">
+<![endif]-->
+                            <div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" width="276" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="right">
+                                    <tr>
+                                        <td valign="top">
+                                            <a data-ko-link="rightImage.url" href="" style="text-decoration: none;"><img data-ko-editable="rightImage.src" hspace="0" align="right" border="0" vspace="0" width="258" height="180" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=258%2C180" class="mobile-full" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020;
+                        -ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]></tr></table><![endif]-->
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /doubleImageBlock -->
+
+
+  <!--  tripleImageBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;
+   " data-ko-block="tripleImageBlock">
+    <tr>
+        <td class="vb-outer" valign="top" align="center" style="">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table data-ko-display="gutterVisible eq false" width="600" class="vb-container fullwidth" cellpadding="0" border="0" bgcolor="#ffffff" align="center" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor;">
+                    <tr>
+                        <td valign="top" align="center" class="mobile-row" style="font-size: 0">
+                            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]><td align="left" valign="top" width="190"><![endif]-->
+                            <div style="display:inline-block; max-width:190px; vertical-align:top; width:100%; " class="mobile-full">
+                                <a data-ko-link="leftImage.url" href="" style="text-decoration: none;"><img data-ko-editable="leftImage.src" hspace="0" align="left" border="0" vspace="0" width="190" height="160" class="mobile-full" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=190%2C160" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020; -ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="190">
+<![endif]-->
+                            <div style="display:inline-block; max-width:190px; vertical-align:top; width:100%; " class="mobile-full">
+                                <a data-ko-link="middleImage.url" href="" style="text-decoration: none;"><img data-ko-editable="middleImage.src" hspace="0" align="left" border="0" vspace="0" width="190" height="160" class="mobile-full" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=190%2C160" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020;
+                  -ko-attr-height: @imageHeight; -ko-attr-alt: @middleImage.alt;" /></a>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="190">
+<![endif]-->
+                            <div style="display:inline-block; max-width:190px; vertical-align:top; width:100%; " class="mobile-full">
+                                <a data-ko-link="rightImage.url" href="" style="text-decoration: none;"><img data-ko-editable="rightImage.src" hspace="0" align="right" border="0" vspace="0" width="190" height="160" class="mobile-full" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=190%2C160" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020;
+                  -ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]></tr></table><![endif]-->
+                        </td>
+                    </tr>
+                </table>
+                <table data-ko-display="gutterVisible" width="600" border="0" cellpadding="0" cellspacing="9" bgcolor="#ffffff" class="vb-row fullpad" style="width: 100%; max-width: 600px; background-color: #ffffff; display: none;">
+                    <tr>
+                        <td align="center" valign="top" bgcolor="#ffffff" style="font-size: 0; background-color: #ffffff; ">
+                            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]-->
+                            <div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" width="184" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="left">
+                                    <tr>
+                                        <td valign="top">
+                                            <a data-ko-link="leftImage.url" href="" style="text-decoration: none;"><img data-ko-editable="leftImage.src" hspace="0" align="left" border="0" vspace="0" width="166" height="160" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=166%2C160" class="mobile-full" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020; -ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="184">
+<![endif]-->
+                            <div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" width="184" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="left">
+                                    <tr>
+                                        <td valign="top">
+                                            <a data-ko-link="middleImage.url" href="" style="text-decoration: none"><img data-ko-editable="middleImage.src" hspace="0" align="left" border="0" vspace="0" width="166" height="160" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=166%2C160" class="mobile-full" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020; -ko-attr-height: @imageHeight; -ko-attr-alt: @middleImage.alt;" /></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td>
+<td align="left" valign="top" width="184">
+<![endif]-->
+                            <div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">
+                                <table class="vb-content" width="184" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="right">
+                                    <tr>
+                                        <td valign="top">
+                                            <a data-ko-link="rightImage.url" href="" style="text-decoration: none"><img data-ko-editable="rightImage.src" hspace="0" align="right" border="0" vspace="0" width="166" height="160" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=166%2C160" class="mobile-full" alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 14px;
+                      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #202020; -ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if (mso)|(lte ie 8)]></td><![endif]-->
+                            <!--[if (mso)|(lte ie 8)]></tr></table><![endif]-->
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /tripleImageBlock -->
+
+
+   <!-- singleArticleBlock -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="singleArticleBlock">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad" bgcolor="#ffffff" style="width: 100%; max-width: 600px; background-color: #ffffff;">
+                    <tr data-ko-display="imageVisible">
+                        <td width="100%" valign="top" align="left" class="links-color">
+                            <a data-ko-link="image.url" href="">
+                                <img data-ko-editable="image.src" border="0" hspace="0" vspace="0" width="534" data-ko-placeholder-height="200" src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=534%2C200" class="mobile-full" alt="" style="vertical-align:top; max-width:534px; width: 100%; height: auto;
+                  -ko-attr-alt: @image.alt" />
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr data-ko-display="titleVisible">
+                                    <td style="font-size: 20px; font-family: Georgia, Palatino, serif; font-weight: normal; line-height: 125%; color: #202020; text-align:left;">
+                                        <span style="color: #202020;" data-ko-editable="text">
+                                          Section Title
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left" style="text-align: left; font-size: 14px; line-height: 150%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000;" data-ko-editable="longText" class="long-text links-color">
+                                        <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /singleArticleBlock -->
+
+<!-- StandardFooter -->
+<table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#f7f7f7" style="background-color: #f7f7f7;" data-ko-block="standardFooter">
+    <tr>
+        <td class="vb-outer" align="center" valign="top" bgcolor="#f7f7f7" style="background-color: #f7f7f7;">
+            <!--[if (mso)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <div class="oldwebkit">
+                <table width="600" border="0" cellpadding="0" cellspacing="9" style="width: 100%; max-width: 600px;">
+                    <tr>
+                        <td align="left">
+                            <table>
+                                <tbody>
+                                    <tr valign="top">
+                                        <img src="https://spu.edu/images/spacer.gif" width="30" height="30" alt="">
+                                        <a href="http://spu.edu/"><img src="https://spu.edu/images/global_header_images/footer_logo_mobile-4.png" alt="Seattle Pacific University" width="250"></a>
+                                        <td width="20"><img src="https://spu.edu/images/spacer.gif" width="20" height="1" alt=""></td>
+                                    </tr>
+                                    <tr valign="top">
+                                        <td width="20"><img src="https://spu.edu/images/spacer.gif" width="20" height="1" alt=""></td>
+                                        <td style="font-family: Helvetica, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; line-height: 20px;">
+                                            <br>
+                                            <span style="color: #333333">Published by: Seattle Pacific University,
+                                                <span class="appleLinks">3307&nbsp;3rd&nbsp;Ave.&nbsp;W., Seattle,&nbsp;WA&nbsp;98119-1950,&nbsp;U.S.A.</span>
+                                            </span>
+                                            <br>
+                                            <!-- Footer Links Area -->
+                                            <a href="http://*|UNSUB|*" style="color: #333333; text-decoration: underline;"><span style="color: #333333; text-decoration: underline;">Unsubscribe</span></a> &nbsp;|&nbsp;
+                                            <a href="http://*|ARCHIVE|*" style="color: #333333; text-decoration: underline;"><span style="color: #333333; text-decoration: underline;">View this email online</span></a>.
+                                            <br style="clear: both;"/>
+                                        </td>
+                                        <td width="20"><img src="https://spu.edu/images/spacer.gif" width="20" height="1" alt=""></td>
+                                        <td width="20"><img src="https://spu.edu/images/spacer.gif" width="20" height="1" alt=""></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--[if (mso)|(lte ie 8)]></td></tr></table><![endif]-->
+        </td>
+    </tr>
+</table>
+<!-- /StandardFooter -->
+
+  </center>
+</body>
+</html>

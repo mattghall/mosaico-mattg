@@ -1,6 +1,6 @@
 @import 'app_standalone.less';
 
-@accent-color: #900000; // #A01020; // #ff9800;
+@accent-color: #05203e; // #A01020; // #ff9800;
 @background-color: #eeeeee;
 // @link-color: #ff9800;
 // @link-color: #ff5722; // #ea1c0d;
@@ -10,7 +10,7 @@
 @standard-border-radius: 2px;
 @info-border-radius: @standard-border-radius;
 @button-border-radius: @standard-border-radius;
-@large-balloon-border-radius: 2px; 
+@large-balloon-border-radius: 2px;
 
 @object-background-color: #DDDDDD;
 // @mosaico-object-shadow: 1px 1px 2px lighten(@shadow-color, 30%);
@@ -33,7 +33,7 @@
 
 @ui-tabs-panel-padding: 0;
 
-// @button-hover-background-color: 
+// @button-hover-background-color:
 
 .button-style() {
   text-transform: uppercase;
@@ -64,7 +64,7 @@
       color: mix(@mosaico-ui-background-color, @button-text-color);
     }
   }
-} 
+}
 
 #main-toolbox #tooltabs.ui-tabs > .ui-tabs-nav {
   box-shadow: 0 0 10px @shadow-color;
@@ -97,11 +97,11 @@
     background-color: transparent;
   }
   li > a when (@buttonstyle) {
-    background-color: transparent; 
+    background-color: transparent;
     &:hover {
       background-color: lighten(@mosaico-ui-background-color, 10%);
       border-bottom: 3px solid lighten(@mosaico-ui-background-color, 10%);
-    } 
+    }
   }
 
   li@{activeclass} a {
@@ -109,7 +109,7 @@
       background-color: transparent;
       color: @button-text-color;
       border-bottom: 3px solid @button-text-color;
-    } 
+    }
   }
 }
 
@@ -209,9 +209,9 @@
 
 .mo .ui-button.ui-spinner-button {
   background-color: transparent;
-  // color: lighten(@text-color, 30%); 
+  // color: lighten(@text-color, 30%);
   .ui-button-text .ui-icon {
-    color: lighten(@text-color, 30%); 
+    color: lighten(@text-color, 30%);
   }
 }
 
@@ -303,8 +303,8 @@
     padding-left: 60px;
   }
 
-  .mo .propInput input[type=text], 
-  .mo .propInput input[type=number], 
+  .mo .propInput input[type=text],
+  .mo .propInput input[type=number],
   .mo .propInput input[type=url],
   .mo .propInput select,
   .mo .propInput .data-select select,
@@ -347,4 +347,4 @@
   .ui-icon {
     color: @button-text-color;
   }
-} 
+}

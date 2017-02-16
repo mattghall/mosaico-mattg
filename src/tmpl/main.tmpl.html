@@ -1,3 +1,21 @@
+<style>
+  #copy2 {
+    animation: pulse 4s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      background-color: #57a040;
+    }
+    50%{
+      background-color: #05203e;
+    }
+    100% {
+      background-color: #57a040;
+    }
+  }
+</style>
+
 <div id="page" style="display: none;" data-bind="visible: true, css: { withToolbox: $root.showToolbox, withPreviewFrame: showPreviewFrame }">
   <div id="main-edit-area" data-bind="click: function(obj, evt) { $root.selectBlock(null); return true; }, clickBubble: false">
     <!-- ko withProperties: { templateMode: 'wysiwyg', templateModeFallback: 'show' } -->
@@ -8,6 +26,9 @@
   <div id="toolbar" class="mo" data-bind="tooltips: {}">
     <!-- ko if: typeof $root.undo != 'undefined' -->
     <span data-bind="buttonset: { }" class="leftButtons">
+    <a title="Hide Menu" id="hideMenuButton" href="javascript:void(0)" onclick="toggleToolbar()" data-bind="button: { icons: { primary: 'fa fa-caret-square-o-left' }}"></a>
+    <a title="Show Menu" id="showMenuButton" href="javascript:void(0)" onclick="toggleToolbar()" data-bind="button: { icons: { primary: 'fa fa-caret-square-o-right' }}" style="display:none"></a>
+    <a title="Edit email properties" href="javascript:void(0)" data-bind="click: $('#openModal').css('display') == 'none' ? $('#openModal').css('display','block') : $('#openModal').css('display','none'), button: { icons: { primary: 'fa fa-info-circle' }}">Properties</a>
     <a title="Undo last operation" href="javascript:void(0)" data-bind="attr: { title: $root.t('Undo last operation') }, click: $root.undo.execute, clickBubble: false, button: { disabled: !$root.undo.enabled(), icons: { primary: 'fa fa-reply' }, label: $root.undo.name, text: true }">UNDO</a>
     <a title="Redo last operation" href="javascript:void(0)" data-bind="attr: { title: $root.t('Redo last operation') }, click: $root.redo.execute, clickBubble: false, button: { disabled: !$root.redo.enabled(), icons: { primary: 'fa fa-share' }, label: $root.redo.name, text: true }">REDO</a>
     </span>
@@ -15,11 +36,6 @@
     <a href="javascript:void(0)" data-bind="click: $root.undoReset, clickBubble: false, button: { disabled: !$root.undo.enabled() && !$root.redo.enabled(), label: 'reset', text: true }">RESET</a>
     <!-- /ko -->
     <!-- /ko -->
-
-    <span>
-    <input id="showGallery" type="checkbox" data-bind="checked: $root.showGallery, button: { refreshOn: $root.showGallery, 
-    icons: { primary: 'fa fa-fw fa-picture-o', secondary: null }, text: true, label: $root.t('Gallery') }"><label title="Show image gallery" for="showGallery" data-bind="attr: { title: $root.t('Show image gallery') }">show gallery</label></input>
-    </span>
 
     <input id="previewFrameToggle" type="checkbox" data-bind="checked: $root.showPreviewFrame, button: { refreshOn: $root.showPreviewFrame, icons: { primary: 'fa fa-fw fa-tablet', secondary: null }, text: false, label: $root.t('Preview') }"><label title="Show live preview" for="previewFrameToggle" data-bind="attr: { title: $root.t('Show live preview') }">PREVIEW</label></input>
 
@@ -35,29 +51,169 @@
     </span>
 
     <div class="rightButtons">
-    <!-- ko if: typeof $root.save !== 'undefined' -->
-    <a title="Save template" href="javascript:void(0)" data-bind="attr: { title: $root.t('Save template') }, click: $root.save.execute, clickBubble: false, button: { disabled: !$root.save.enabled(), icons: { primary: 'fa fa-fw fa-cloud-upload' }, label: $root.t($root.save.name), text: true }">SALVA</a>
-    <!-- /ko -->
-    <!-- ko if: typeof $root.test !== 'undefined' -->
-    <a title="Show preview and send test" href="javascript:void(0)" data-bind="attr: { title: $root.t('Show preview and send test') }, click: $root.test.execute, clickBubble: false, button: { disabled: !$root.test.enabled(), icons: { primary: 'fa fa-fw fa-paper-plane' }, label: $root.t($root.test.name), text: true }">TEST</a>
-    <!-- /ko -->
-    <!-- ko if: typeof $root.download !== 'undefined' -->
-    <form id="downloadForm" action="#" method="POST">
-    <input type="hidden" name="action" value="download" />
-    <input type="hidden" name="filename" value="email.html" />
-    <input type="hidden" name="html" id="downloadHtmlTextarea" />
-    <a title="Download template" href="javascript:void(0)" data-bind="attr: { title: $root.t('Download template') }, click: $root.download.execute, clickBubble: false, button: { disabled: !$root.download.enabled(), icons: { primary: 'fa fa-fw fa-download' }, label: $root.t($root.download.name), text: true }">DOWNLOAD</a>
-    </form>
-    <!-- /ko -->
+      <!-- ko if: typeof $root.save !== 'undefined' -->
+      <form id="saveForm" action="#" method="POST">
+          <input type="hidden" name="action" value="save" />
+          <input type="hidden" name="filename" value="email" />
+          <input type="hidden" name="metadata" />
+          <input type="hidden" name="html" id="saveContentTextarea" />
+          <a title="Save template" href="javascript:void(0)" data-bind="attr: { title: $root.t('Save template') }, click: $root.save.execute, clickBubble: false, button: { disabled: !$root.save.enabled(), icons: { primary: 'fa fa-floppy-o' }, label: $root.t($root.save.name), text: true }">SAVE</a>
+      </form>
+      <!-- /ko -->
+      <!-- ko if: typeof $root.autosave !== 'undefined' -->
+      <form id="autosaveForm" style="display: none" action="#" method="POST">
+          <input type="hidden" name="action" value="autosave" />
+          <input type="hidden" name="filename" value="hash" />
+          <input type="hidden" name="html" id="autosaveContentTextarea" />
+          <a id="autosave" title="AutoSave template" href="javascript:void(0)" data-bind="attr: { title: $root.t('Auto Save template') }, click: $root.autosave.execute, clickBubble: false, button: { disabled: !$root.autosave.enabled(), icons: { primary: 'fa fa-fw fa-cloud-upload' }, label: $root.t($root.autosave.name), text: true }">Autosave</a>
+      </form>
+  <!-- /ko -->
+
+      <!-- ko if: typeof $root.copy !== 'undefined' -->
+      <a id="copy1" title="Copy email to clipboard" href="javascript:void(0)" data-bind="attr: { title: $root.t('Copy contents to Clipboard') }, click: $root.copy.execute, clickBubble: false, button: { disabled: !$root.copy.enabled(), icons: { primary: 'fa fa-fw fa-copy' }, label: $root.t($root.copy.name), text: true }">COPY</a>
+      <!-- /ko -->
+
+      <!-- ko if: typeof $root.copy2 !== 'undefined' -->
+      <a id="copy2" title="Copy email to clipboard" href="javascript:void(0)" style="background-color: #57a040; display:none;" data-bind="attr: { title: $root.t('Copy contents to Clipboard') }, click: $root.copy2.execute, clickBubble: false, button: { disabled: !$root.copy2.enabled(), icons: { primary: 'fa fa-fw fa-copy' }, label: $root.t($root.copy2.name), text: true }">COPY</a>
+      <!-- /ko -->
+
+      <!-- ko if: typeof $root.test !== 'undefined' -->
+      <a title="Send to Email on Acid for testing" href="javascript:void(0)" data-bind="attr: { title: $root.t('Send to Email on Acid for testing') }, click: $root.test.execute, clickBubble: false, button: { disabled: !$root.test.enabled(), icons: { primary: 'fa fa-fw fa-magic' }, label: $root.t($root.test.name), text: true }">TEST</a>
+      <!-- /ko -->
+
+      <!-- ko if: typeof $root.send !== 'undefined' -->
+      <a title="Send a test email to yourself" href="javascript:void(0)" data-bind="attr: { title: $root.t('Send a test email to yourself') }, click: $root.send.execute, clickBubble: false, button: { disabled: !$root.send.enabled(), icons: { primary: 'fa fa-fw fa-paper-plane' }, label: $root.t($root.send.name), text: true }">SEND</a>
+      <!-- /ko -->
+
+      <!-- ko if: typeof $root.download !== 'undefined' -->
+      <form id="downloadForm" action="#" method="POST">
+          <input type="hidden" name="action" value="download" />
+          <input type="hidden" name="filename" value="email.html" />
+          <input type="hidden" name="html" id="downloadHtmlTextarea" />
+          <a title="Download template" href="javascript:void(0)" data-bind="attr: { title: $root.t('Download template') }, click: $root.download.execute, clickBubble: false, button: { disabled: !$root.download.enabled(), icons: { primary: 'fa fa-fw fa-download' }, label: $root.t($root.download.name), text: true }">DOWNLOAD</a>
+      </form>
+      <!-- /ko -->
     </div>
   </div>
 
+<div data-bind='template: {afterRender: loadMetaToEditor }'>
+      <!-- The Modal -->
+    <div id="openModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-close"><a title="Close" href="javascript:void(0)" data-bind="click: $('#openModal').css('display','none');">&times</a></span>
+          <h2>Email Properties</h2>
+        </div>
+        <div class="modal-body">
+          <table><tr>
+              <td><b>HASH:</b>&nbsp;<input id="mdHash" disabled="true" value="######" data-bind="value: location.hash ? location.href.split('#')[1] : 'deafult';" style="border: none; background: transparent;"></td>
+              <td><b>Template:</b>&nbsp;<input id="mdTemplateDisp" disabled="true" value="unknown" style="border: none; background: transparent;"><input id="mdTemplate" type="hidden" disabled="true" value="unknown"></td>
+            </tr><tr>
+              <td>
+                <b>Owner:</b>&nbsp;<input id="mdAuthor" value="unknown" disabled="true" style="border: none; background: transparent; width:75px;">
+                <button data-bind="click: ChangeOwner" style=" float:right;">Change</button>
+                <a id="extraSaveButton" title="Save template" href="javascript:void(0)" style="visibility: hidden" data-bind="attr: { title: $root.t('Save template') }, click: $root.save.execute, clickBubble: false, button: { disabled: !$root.save.enabled(), icons: { primary: 'fa fa-fw fa-cloud-upload' }, label: $root.t($root.save.name), text: true }">SAVE</a>
+              </td>
+              <td><b>Last Change:</b>&nbsp;<input id="mdLastChanger" disabled="true" value="unknown" style="border: none; background: transparent;"></td>
+            </tr><tr>
+              <td><b>Project:</b>&nbsp;<input id="mdProject" value="unnamed"></td>
+              <td><b>Department:</b>&nbsp;
+                <select id="mdDept">
+                  <option value="">Select a Department</option>
+                  <option value="Academic Affairs">Academic Affairs</option>
+                  <option value="Advancement Services">Advancement Services</option>
+                  <option value="Affiliate Faculty">Affiliate Faculty</option>
+                  <option value="Alumni">Alumni</option>
+                  <option value="Art">Art</option>
+                  <option value="Arts &amp; Sciences">Arts &amp; Sciences</option>
+                  <option value="Athletics">Athletics</option>
+                  <option value="Biology">Biology</option>
+                  <option value="Budget &amp; Finance">Budget &amp; Finance</option>
+                  <option value="Building Maintenance">Building Maintenance</option>
+                  <option value="Business &amp; Finance">Business &amp; Finance</option>
+                  <option value="Business Government Economics">Business Government Economics</option>
+                  <option value="Casey Conference Center">Casey Conference Center</option>
+                  <option value="Center Biblical Theologcl Educ">Center Biblical Theologcl Educ</option>
+                  <option value="Center for Career &amp; Calling">Center for Career &amp; Calling</option>
+                  <option value="Center for Learning">Center for Learning</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Clinical Psychology">Clinical Psychology</option>
+                  <option value="Communication/Journalism">Communication/Journalism</option>
+                  <option value="Computer &amp; Info Systems">Computer &amp; Info Systems</option>
+                  <option value="Conference Services">Conference Services</option>
+                  <option value="Controller">Controller</option>
+                  <option value="Ctr for Scholarshp/Faculty Dev">Ctr for Scholarshp/Faculty Dev</option>
+                  <option value="Education">Education</option>
+                  <option value="Emeriti Faculty">Emeriti Faculty</option>
+                  <option value="Engineering &amp; Computer Science">Engineering &amp; Computer Science</option>
+                  <option value="English">English</option>
+                  <option value="Enrollment Management &amp; Mrktng">Enrollment Management &amp; Mrktng</option>
+                  <option value="Facility &amp; Project Management">Facility &amp; Project Management</option>
+                  <option value="Family &amp; Consumer Science">Family &amp; Consumer Science</option>
+                  <option value="Health &amp; Human Performance">Health &amp; Human Performance</option>
+                  <option value="Health Sciences">Health Sciences</option>
+                  <option value="Health Services">Health Services</option>
+                  <option value="History">History</option>
+                  <option value="Housekeeping">Housekeeping</option>
+                  <option value="Housing &amp; Meal Plan Services">Housing &amp; Meal Plan Services</option>
+                  <option value="Human Resources">Human Resources</option>
+                  <option value="Industrial/Organizational Psyc">Industrial/Organizational Psyc</option>
+                  <option value="Institutional Research">Institutional Research</option>
+                  <option value="Languages Cultures Linguistics">Languages Cultures Linguistics</option>
+                  <option value="Library">Library</option>
+                  <option value="Mailing Services">Mailing Services</option>
+                  <option value="Major Gifts">Major Gifts</option>
+                  <option value="Marriage &amp; Family Therapy">Marriage &amp; Family Therapy</option>
+                  <option value="Master of Fine Arts">Master of Fine Arts</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="Multi-Ethnic Programs">Multi-Ethnic Programs</option>
+                  <option value="Music">Music</option>
+                  <option value="Office of the President">Office of the President</option>
+                  <option value="Office of the Provost">Office of the Provost</option>
+                  <option value="Perkins Center">Perkins Center</option>
+                  <option value="Philosophy">Philosophy</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Planning &amp; Administration">Planning &amp; Administration</option>
+                  <option value="Political Science">Political Science</option>
+                  <option value="Psychology">Psychology</option>
+                  <option value="Psychology, Family &amp; Community">Psychology, Family &amp; Community</option>
+                  <option value="Residence Life">Residence Life</option>
+                  <option value="Retired Staff with Privileges">Retired Staff with Privileges</option>
+                  <option value="SP Foundation">SP Foundation</option>
+                  <option value="Safety &amp; Security">Safety &amp; Security</option>
+                  <option value="Sociology">Sociology</option>
+                  <option value="Stdnt Involvement &amp; Leadership">Stdnt Involvement &amp; Leadership</option>
+                  <option value="Student Academic Services">Student Academic Services</option>
+                  <option value="Student Counseling Center">Student Counseling Center</option>
+                  <option value="Student Financial Services">Student Financial Services</option>
+                  <option value="Student Life">Student Life</option>
+                  <option value="TESOL Graduate Program">TESOL Graduate Program</option>
+                  <option value="Theatre">Theatre</option>
+                  <option value="Theology">Theology</option>
+                  <option value="Univ Recruitment &amp; Admissions">Univ Recruitment &amp; Admissions</option>
+                  <option value="University Advancement">University Advancement</option>
+                  <option value="University Communications">University Communications</option>
+                  <option value="University Ministries">University Ministries</option>
+                  <option value="University Services">University Services</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><b>Created:</b>&nbsp;<input disabled="true" id="mdDateCreatedDisp" value="unknown" style="border: none; background: transparent;"><input id="mdDateCreated" value="unknown" type="hidden"></td>
+              <td><b>Last Edited:</b>&nbsp;<input disabled="true" id="mdLastEdit" value="unknown" style="border: none; background: transparent;"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- ko if: $root.showToolbox -->
   <div id="main-toolbox" class="mo" data-bind="scrollable: true, withProperties: { templateMode: 'edit' }">
     <div data-bind="template: { name: 'toolbox' }"></div>
   </div>
   <!-- /ko -->
-  
+
   <div id="main-preview" class="mo" data-bind="scrollable: true, if: $root.showPreviewFrame">
     <div id="preview-toolbar">
       <div data-bind="visible: $root.showPreviewFrame, buttonset: { }" style="display: inline-block">
@@ -93,7 +249,6 @@
   </div>
 
 </div>
-
 <!-- ko if: $root.logoPath -->
 <div id="loading" class="loading" style="display: block; width: 300px; text-align: center; height: 32px; position: absolute; top:0; bottom: 0; left: 0; right: 0;  margin: auto;" data-bind="attr: { style: 'position: absolute; top: 5px; left: 6px; z-index: 150;'}, css: { loading: false }">
   <a href="/" data-bind="attr: { href: $root.logoUrl, alt: $root.logoAlt }"><img data-bind="attr: { src: $root.logoPath }" width="32" height="32" alt="mosaico" border="0" /></a>

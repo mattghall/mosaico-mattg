@@ -1,5 +1,22 @@
-# mosaico-mattg
-Fork of voidlabs/mosaico. 
+# Foreword
+
+This project is a modification of voidlabs/mosaico hosted at https://github.com/voidlabs/mosaico. Voidlabs owns the rights to Mosaico and this repository should not be used to distribute software.
+
+I liked the idea of Voidlabs' Mosaico email templating software, but the original project was very limited and I saw potential for the software to become much more useful. As a computer science student, I modified the original to include some new helpful features as a spare time project. I often send html emails for the University I attend so I made modifications to make my job significantly easier.
+
+Changes:
+- Save/Autosave emails on a server
+- Copy HTML of email to clipboard
+- Filtering saved emails by various fields
+- Duplicate emails-
+- Login connected to the server's saved user/pass relationships
+- Adding Extra properties and meta data to emails
+- The templates I use for sending emails
+- UI changes to make the app more aesthetically pleasing
+- Changed to a Mariners color scheme, because Go Mariners
+
+Everything below this line is the Original README from voidlabs
+
 # Mosaico - Responsive Email Template Editor
 
 Mosaico is a JavaScript library (or maybe a single page application) supporting the editing of email templates.
@@ -26,7 +43,7 @@ Subscribe to our newsletter to get updates: http://mosaico.voxmail.it/user/regis
 
 ### Build/Run  [![Build Status](https://travis-ci.org/voidlabs/mosaico.svg)](https://travis-ci.org/voidlabs/mosaico)
 
-this may raise warnings about Knockout, ignore them. It will probably fail on some colorpicker dependency, just run it again and will work:
+this may raise warnings about Knockout, ignore them. It will probably fail on some colorpicker dependency, just run it again and it will work:
 ```
   npm install
 ```
